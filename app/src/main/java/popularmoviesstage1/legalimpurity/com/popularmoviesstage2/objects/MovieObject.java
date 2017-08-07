@@ -3,6 +3,8 @@ package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 /**
  * Created by rajatkhanna on 01/08/17.
  */
@@ -11,6 +13,10 @@ public class MovieObject implements Parcelable {
 
     // Same as is from api, as they will always be Unique
     private long _id;
+
+    private ArrayList <ReviewObject> ReviewObjs;
+    private ArrayList <TrailerVideoObject> TrailerVideoObjs;
+
 
     private String OrignalTitle;
     private String MoviePosterImageThumbnailUrl;
@@ -24,6 +30,40 @@ public class MovieObject implements Parcelable {
         PlotSynopsis = plotSynopsis;
         UserRating = userRating;
         ReleaseDate = releaseDate;
+    }
+
+    // New constructor, will remove the old one soon
+    public MovieObject(long _id, String orignalTitle, String moviePosterImageThumbnailUrl, String plotSynopsis, String userRating, String releaseDate) {
+        this._id = _id;
+        OrignalTitle = orignalTitle;
+        MoviePosterImageThumbnailUrl = moviePosterImageThumbnailUrl;
+        PlotSynopsis = plotSynopsis;
+        UserRating = userRating;
+        ReleaseDate = releaseDate;
+    }
+
+    public long get_id() {
+        return _id;
+    }
+
+    public void set_id(long _id) {
+        this._id = _id;
+    }
+
+    public ArrayList<ReviewObject> getReviewObjs() {
+        return ReviewObjs;
+    }
+
+    public void setReviewObjs(ArrayList<ReviewObject> reviewObjs) {
+        ReviewObjs = reviewObjs;
+    }
+
+    public ArrayList<TrailerVideoObject> getTrailerVIdeoObjs() {
+        return TrailerVideoObjs;
+    }
+
+    public void setTrailerVIdeoObjs(ArrayList<TrailerVideoObject> TrailerVideoObjs) {
+        TrailerVideoObjs = TrailerVideoObjs;
     }
 
     public String getOrignalTitle() {
@@ -80,8 +120,9 @@ public class MovieObject implements Parcelable {
                 this.UserRating,
                 this.ReleaseDate
         });
-
-
+//        How to write to arraylist of custom objects in Parcelable ?
+//        dest.readTypedList(ReviewObjs);
+//        dest.readTypedList(TrailerVideoObjs);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -103,7 +144,6 @@ public class MovieObject implements Parcelable {
         this.PlotSynopsis = data[2];
         this.UserRating = data[3];
         this.ReleaseDate = data[4];
-
     }
 
 }
