@@ -1,4 +1,4 @@
-package popularmoviesstage1.legalimpurity.com.popularmoviesstage1.adapters;
+package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.adapters;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
@@ -11,10 +11,10 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.R;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.Utils.NetworkUtils;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.listeners.MovieClickListener;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.objects.MovieObject;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.R;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.listeners.MovieClickListener;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 
 
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.MovieItemHolder>{

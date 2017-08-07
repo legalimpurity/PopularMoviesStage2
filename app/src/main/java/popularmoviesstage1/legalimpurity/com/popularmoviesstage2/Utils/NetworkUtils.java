@@ -1,4 +1,4 @@
-package popularmoviesstage1.legalimpurity.com.popularmoviesstage1.Utils;
+package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,7 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.BuildConfig;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.BuildConfig;
 
 public final class NetworkUtils {
 

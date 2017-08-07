@@ -1,4 +1,4 @@
-package popularmoviesstage1.legalimpurity.com.popularmoviesstage1.Utils;
+package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils;
 
 import android.content.Context;
 
@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.objects.MovieObject;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 
 
 public class MoviesJsonUtils {

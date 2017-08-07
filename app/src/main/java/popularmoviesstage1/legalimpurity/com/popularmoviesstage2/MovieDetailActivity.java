@@ -1,4 +1,4 @@
-package popularmoviesstage1.legalimpurity.com.popularmoviesstage1;
+package popularmoviesstage1.legalimpurity.com.popularmoviesstage2;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,8 +15,8 @@ import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.Utils.NetworkUtils;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.objects.MovieObject;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 
 public class MovieDetailActivity extends AppCompatActivity {
 

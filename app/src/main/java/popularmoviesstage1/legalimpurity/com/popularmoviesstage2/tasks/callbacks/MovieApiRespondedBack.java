@@ -1,8 +1,8 @@
-package popularmoviesstage1.legalimpurity.com.popularmoviesstage1.tasks.callbacks;
+package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.callbacks;
 
 import java.util.ArrayList;
 
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.objects.MovieObject;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 
 /**
  * Created by rajatkhanna on 03/08/17.

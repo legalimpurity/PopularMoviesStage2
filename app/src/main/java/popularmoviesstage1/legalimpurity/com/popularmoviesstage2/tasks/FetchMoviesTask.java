@@ -1,4 +1,4 @@
-package popularmoviesstage1.legalimpurity.com.popularmoviesstage1.tasks;
+package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -6,10 +6,10 @@ import android.os.AsyncTask;
 import java.net.URL;
 import java.util.ArrayList;
 
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.Utils.MoviesJsonUtils;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.Utils.NetworkUtils;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.objects.MovieObject;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.tasks.callbacks.MovieApiRespondedBack;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.MoviesJsonUtils;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.callbacks.MovieApiRespondedBack;
 
 /**
  * Created by rajatkhanna on 03/08/17.

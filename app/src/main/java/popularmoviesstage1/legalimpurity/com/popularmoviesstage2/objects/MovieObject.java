@@ -1,4 +1,4 @@
-package popularmoviesstage1.legalimpurity.com.popularmoviesstage1.objects;
+package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects;
 
 import android.os.Parcel;
 import android.os.Parcelable;

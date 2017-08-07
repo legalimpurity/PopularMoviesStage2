@@ -1,4 +1,4 @@
-package popularmoviesstage1.legalimpurity.com.popularmoviesstage1;
+package popularmoviesstage1.legalimpurity.com.popularmoviesstage2;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

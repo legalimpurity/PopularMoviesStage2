@@ -1,4 +1,4 @@
-package popularmoviesstage1.legalimpurity.com.popularmoviesstage1.Utils;
+package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

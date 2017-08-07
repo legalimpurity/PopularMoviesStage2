@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="popularmoviesstage1.legalimpurity.com.popularmoviesstage1.MovieDetailActivity">
+    tools:context="popularmoviesstage1.legalimpurity.com.popularmoviesstage2.MovieDetailActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"

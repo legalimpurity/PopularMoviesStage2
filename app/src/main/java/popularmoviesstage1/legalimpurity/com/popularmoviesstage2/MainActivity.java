@@ -1,4 +1,4 @@
-package popularmoviesstage1.legalimpurity.com.popularmoviesstage1;
+package popularmoviesstage1.legalimpurity.com.popularmoviesstage2;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -20,13 +20,13 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.Utils.NetworkStateReceiver;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.Utils.NetworkUtils;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.adapters.MovieListAdapter;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.listeners.MovieClickListener;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.objects.MovieObject;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.tasks.FetchMoviesTask;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage1.tasks.callbacks.MovieApiRespondedBack;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkStateReceiver;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.adapters.MovieListAdapter;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.listeners.MovieClickListener;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.FetchMoviesTask;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.callbacks.MovieApiRespondedBack;
 
 public class MainActivity extends AppCompatActivity {
 
