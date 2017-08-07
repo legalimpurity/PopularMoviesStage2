@@ -8,6 +8,10 @@ import android.os.Parcelable;
  */
 
 public class MovieObject implements Parcelable {
+
+    // Same as is from api, as they will always be Unique
+    private long _id;
+
     private String OrignalTitle;
     private String MoviePosterImageThumbnailUrl;
     private String PlotSynopsis;
