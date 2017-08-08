@@ -20,7 +20,7 @@ public class MoviesContract {
 
         public static final String TABLE_NAME = "movies";
 
-        public static final String COLUMN_ID = "id";
+        public static final String COLUMN_API_ID = "api_id";
         public static final String COLUMN_ORIGNAL_TITLE = "orignal_title";
         public static final String COLUMN_POSTER_URL = "poster_url";
         public static final String COLUMN_PLOT_SYNOPSIS = "plot_synopsis";
@@ -37,7 +37,6 @@ public class MoviesContract {
 
         public static final String TABLE_NAME = "reviews";
 
-        public static final String COLUMN_ID = "id";
         public static final String COLUMN_API_ID = "api_id";
         public static final String COLUMN_AUTHOR = "author";
         public static final String COLUMN_CONTENT = "content";
@@ -53,7 +52,7 @@ public class MoviesContract {
 
         public static final String TABLE_NAME = "trailer_videos";
 
-        public static final String COLUMN_ID = "id";
+        public static final String COLUMN_API_ID = "api_id";
         public static final String COLUMN_NAME = "trailer_name";
         public static final String COLUMN_YOUTUBE_KEY = "youtube_key";
     }
