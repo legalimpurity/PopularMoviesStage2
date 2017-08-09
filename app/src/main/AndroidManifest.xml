@@ -27,6 +27,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="popularmoviesstage1.legalimpurity.com.popularmoviesstage2.MainActivity" />
         </activity>
+
+        <provider
+            android:name="popularmoviesstage1.legalimpurity.com.popularmoviesstage2.contentprovider.MovieContentProvider"
+            android:authorities="popularmoviesstage1.legalimpurity.com.popularmoviesstage2.provider"
+            android:exported="false"/>
+
     </application>
 
 </manifest>
