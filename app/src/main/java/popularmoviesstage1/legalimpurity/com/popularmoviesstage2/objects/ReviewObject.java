@@ -10,11 +10,11 @@ import android.os.Parcelable;
 public class ReviewObject implements Parcelable {
     private long _id;
 
-    private long ApiID;
+    private String ApiID;
     private String Author;
     private String Content;
 
-    public ReviewObject(long _id, long apiID, String author, String content) {
+    public ReviewObject(long _id, String apiID, String author, String content) {
         this._id = _id;
         ApiID = apiID;
         Author = author;
@@ -29,11 +29,11 @@ public class ReviewObject implements Parcelable {
         this._id = _id;
     }
 
-    public long getApiID() {
+    public String getApiID() {
         return ApiID;
     }
 
-    public void setApiID(long apiID) {
+    public void setApiID(String apiID) {
         ApiID = apiID;
     }
 
@@ -63,11 +63,11 @@ public class ReviewObject implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[] {
                 this.Author,
-                this.Content
+                this.Content,
+                this.ApiID
         });
         dest.writeLongArray(new long[]{
-                this._id,
-                this.ApiID
+                this._id
         });
     }
 
@@ -82,14 +82,14 @@ public class ReviewObject implements Parcelable {
     };
 
     public ReviewObject(Parcel in){
-        String[] data = new String[2];
+        String[] data = new String[3];
         in.readStringArray(data);
         this.Author = data[0];
         this.Content = data[1];
+        this.ApiID = data[2];
 
-        long[] data2 = new long[2];
+        long[] data2 = new long[1];
         in.readLongArray(data2);
         this._id = data2[0];
-        this.ApiID = data2[1];
     }
 }

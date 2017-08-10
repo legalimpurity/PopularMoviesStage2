@@ -20,11 +20,42 @@ public final class NetworkUtils {
     private static final String MOVIE_DATABASE_ROOT_URL = "https://api.themoviedb.org/3/movie/";
     public static final String MOVIES_IMAGE_URL = "https://image.tmdb.org/t/p/w185/";
 
+    private static final String REVIEWS_APPENDING_TAG = "/reviews";
+    private static final String VIDEOS_APPENDING_TAG = "/videos";
+
     // Get your own from www.themoviedb.org
     private final static String API_KEY_VALUE = BuildConfig.THE_MOVIE_DB_API_TOKEN;
 
 
     private final static String API_KEY = "api_key";
+
+    public static URL buildReviewsUrl(String movieApiId) {
+        Uri builtUri = Uri.parse(MOVIE_DATABASE_ROOT_URL+movieApiId+REVIEWS_APPENDING_TAG).buildUpon()
+                .appendQueryParameter(API_KEY, API_KEY_VALUE)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+
+    public static URL buildMoviesUrl(String movieApiId) {
+        Uri builtUri = Uri.parse(MOVIE_DATABASE_ROOT_URL+movieApiId+VIDEOS_APPENDING_TAG).buildUpon()
+                .appendQueryParameter(API_KEY, API_KEY_VALUE)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
 
     public static URL buildSortByUrl(String appendingUrl) {
         Uri builtUri = Uri.parse(MOVIE_DATABASE_ROOT_URL+appendingUrl).buildUpon()

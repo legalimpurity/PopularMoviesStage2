@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.R;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.moviedetailfragments.MainDetailFragment;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.moviedetailfragments.ReviewsFragment;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 
 public class MovieDetailPagerAdapter extends FragmentPagerAdapter {
@@ -21,6 +22,14 @@ public class MovieDetailPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+        switch (position) {
+            case 0:
+                return MainDetailFragment.newInstance(mo);
+            case 1:
+                return ReviewsFragment.newInstance(mo);
+            case 2:
+                return MainDetailFragment.newInstance(mo);
+        }
         return MainDetailFragment.newInstance(mo);
     }
 

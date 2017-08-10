@@ -29,8 +29,7 @@ import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.listeners.Movie
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.FetchMoviesLoader;
 
-public class MainActivity extends AppCompatActivity  implements
-        LoaderManager.LoaderCallbacks {
+public class MainActivity extends AppCompatActivity  implements LoaderManager.LoaderCallbacks {
 
     @BindView(R.id.movie_list_recycler_view) RecyclerView movie_list_recycler_view;
     @BindView(R.id.no_internet_text_view) TextView no_internet_text_view;
@@ -49,8 +48,8 @@ public class MainActivity extends AppCompatActivity  implements
         ButterKnife.bind(this);
         findViews(this);
         setAdapter(this);
+        selectedApi = "popular";
         if(NetworkUtils.isNetworkAvailable(this)) {
-            selectedApi = "popular";
             // Will be called from networkAvailable Function
             //  loadMoviesData(this, selectedApi);
         }
@@ -123,8 +122,8 @@ public class MainActivity extends AppCompatActivity  implements
         queryBundle.putString(FetchMoviesLoader.SORT_BY_PARAM, sort_by);
 
         LoaderManager loaderManager = getSupportLoaderManager();
-        Loader<String> githubSearchLoader = loaderManager.getLoader(MOVIES_DATA_LOADER);
-        if (githubSearchLoader == null) {
+        Loader<String> moviesLoader = loaderManager.getLoader(MOVIES_DATA_LOADER);
+        if (moviesLoader == null) {
             loaderManager.initLoader(MOVIES_DATA_LOADER, queryBundle, this);
         } else {
             loaderManager.restartLoader(MOVIES_DATA_LOADER, queryBundle, this);

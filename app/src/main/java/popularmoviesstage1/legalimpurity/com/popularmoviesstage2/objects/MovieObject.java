@@ -18,13 +18,17 @@ public class MovieObject implements Parcelable {
     private ArrayList <TrailerVideoObject> TrailerVideoObjs;
 
 
+    private long ApiId;
     private String OrignalTitle;
     private String MoviePosterImageThumbnailUrl;
     private String PlotSynopsis;
     private String UserRating;
     private String ReleaseDate;
 
-    public MovieObject(String orignalTitle, String moviePosterImageThumbnailUrl, String plotSynopsis, String userRating, String releaseDate) {
+    // To be used when creating object from api
+
+    public MovieObject(long ApiId, String orignalTitle, String moviePosterImageThumbnailUrl, String plotSynopsis, String userRating, String releaseDate) {
+        this.ApiId = ApiId;
         OrignalTitle = orignalTitle;
         MoviePosterImageThumbnailUrl = moviePosterImageThumbnailUrl;
         PlotSynopsis = plotSynopsis;
@@ -32,14 +36,23 @@ public class MovieObject implements Parcelable {
         ReleaseDate = releaseDate;
     }
 
-    // New constructor, will remove the old one soon
-    public MovieObject(long _id, String orignalTitle, String moviePosterImageThumbnailUrl, String plotSynopsis, String userRating, String releaseDate) {
+    // To be used when creating object from db
+    public MovieObject(long _id, long ApiId, String orignalTitle, String moviePosterImageThumbnailUrl, String plotSynopsis, String userRating, String releaseDate) {
         this._id = _id;
+        this.ApiId = ApiId;
         OrignalTitle = orignalTitle;
         MoviePosterImageThumbnailUrl = moviePosterImageThumbnailUrl;
         PlotSynopsis = plotSynopsis;
         UserRating = userRating;
         ReleaseDate = releaseDate;
+    }
+
+    public long getApiId() {
+        return ApiId;
+    }
+
+    public void setApiId(long apiId) {
+        ApiId = apiId;
     }
 
     public long get_id() {
@@ -120,6 +133,13 @@ public class MovieObject implements Parcelable {
                 this.UserRating,
                 this.ReleaseDate
         });
+
+        dest.writeLongArray(new long[] {
+                this._id,
+                this.ApiId
+        });
+
+
 //        How to write to arraylist of custom objects in Parcelable ?
 //        dest.readTypedList(ReviewObjs);
 //        dest.readTypedList(TrailerVideoObjs);
@@ -144,6 +164,12 @@ public class MovieObject implements Parcelable {
         this.PlotSynopsis = data[2];
         this.UserRating = data[3];
         this.ReleaseDate = data[4];
+
+        long[] data2 = new long[2];
+
+        in.readLongArray(data2);
+        _id = data2[0];
+        ApiId = data2[1];
     }
 
 }

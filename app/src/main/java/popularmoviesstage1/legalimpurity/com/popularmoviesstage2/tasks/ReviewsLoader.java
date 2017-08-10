@@ -10,16 +10,16 @@ import java.util.ArrayList;
 
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.JsonUtils;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.ReviewObject;
 
-public class FetchMoviesLoader extends AsyncTaskLoader {
+public class ReviewsLoader extends AsyncTaskLoader {
 
-    public static final String SORT_BY_PARAM = "SORT_BY_PARAM";
+    public static final String MOVIE_API_ID = "MOVIE_API_ID";
 
     private Context context;
     private Bundle args;
 
-    public FetchMoviesLoader(Context context, Bundle args) {
+    public ReviewsLoader(Context context, Bundle args) {
         super(context);
         this.context = context;
         this.args = args;
@@ -34,21 +34,20 @@ public class FetchMoviesLoader extends AsyncTaskLoader {
     }
 
     @Override
-    public ArrayList<MovieObject> loadInBackground() {
-        String sortByParam = args.getString(SORT_BY_PARAM);
+    public ArrayList<ReviewObject> loadInBackground() {
+        String movieAPIID = args.getString(MOVIE_API_ID);
 
-        if (sortByParam == null || TextUtils.isEmpty(sortByParam)) {
+        if (movieAPIID == null || TextUtils.isEmpty(movieAPIID)) {
             return null;
         }
 
-        URL sortByRequestUrl = NetworkUtils.buildSortByUrl(sortByParam);
+        URL sortByRequestUrl = NetworkUtils.buildReviewsUrl(movieAPIID);
 
         try {
             String jsonMoviesResponse = NetworkUtils
                     .getResponseFromHttpUrl(sortByRequestUrl);
-            ArrayList<MovieObject> output = JsonUtils.getMovieObjectsFromJson(context,jsonMoviesResponse);
+            ArrayList<ReviewObject> output = JsonUtils.getReviewObjectsFromJson(context,jsonMoviesResponse);
             return output;
-
         } catch (Exception e) {
             e.printStackTrace();
             return null;
