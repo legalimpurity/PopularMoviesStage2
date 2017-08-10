@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -25,19 +27,20 @@ import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUt
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.adapters.MovieListAdapter;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.listeners.MovieClickListener;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.FetchMoviesTask;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.callbacks.MovieApiRespondedBack;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.FetchMoviesLoader;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  implements
+        LoaderManager.LoaderCallbacks {
 
     @BindView(R.id.movie_list_recycler_view) RecyclerView movie_list_recycler_view;
     @BindView(R.id.no_internet_text_view) TextView no_internet_text_view;
-
 
     private MovieListAdapter mAdapter;
     private ArrayList<MovieObject> movies_list;
 
     private String selectedApi = "popular";
+
+    private static final int MOVIES_DATA_LOADER = 22;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void networkUnavailable() {
-//                movie_list_recycler_view.setVisibility(View.GONE);
-//                no_internet_text_view.setText(R.string.no_internet);
-//                no_internet_text_view.setVisibility(View.VISIBLE);
             }
         });
         act.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
@@ -118,32 +118,51 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private ArrayList<MovieObject> dummyData()
-    {
-        ArrayList<MovieObject> dummyData = new ArrayList<MovieObject>();
-        dummyData.add(new MovieObject("Title","http://i.imgur.com/DvpvklR.png","plot synopsis","userRating",""));
-        dummyData.add(new MovieObject("Title","http://i.imgur.com/DvpvklR.png","plot synopsis","userRating",""));
-        dummyData.add(new MovieObject("Title","http://i.imgur.com/DvpvklR.png","plot synopsis","userRating",""));
-        dummyData.add(new MovieObject("Title","http://i.imgur.com/DvpvklR.png","plot synopsis","userRating",""));
-        dummyData.add(new MovieObject("Title","http://i.imgur.com/DvpvklR.png","plot synopsis","userRating",""));
-        return dummyData;
+    private void loadMoviesData(Activity act, String sort_by) {
+        Bundle queryBundle = new Bundle();
+        queryBundle.putString(FetchMoviesLoader.SORT_BY_PARAM, sort_by);
+
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<String> githubSearchLoader = loaderManager.getLoader(MOVIES_DATA_LOADER);
+        if (githubSearchLoader == null) {
+            loaderManager.initLoader(MOVIES_DATA_LOADER, queryBundle, this);
+        } else {
+            loaderManager.restartLoader(MOVIES_DATA_LOADER, queryBundle, this);
+        }
     }
 
-    private void loadMoviesData(Activity act, String sort_by) {
+    private void showErrorMessage()
+    {
+        no_internet_text_view.setText(R.string.api_error);
+        no_internet_text_view.setVisibility(View.VISIBLE);
+        movie_list_recycler_view.setVisibility(View.GONE);
+    }
 
-        MovieApiRespondedBack responder = new MovieApiRespondedBack() {
-            @Override
-            public void onApiResponded(ArrayList<MovieObject> response) {
-                if(response == null)
-                {
-                    no_internet_text_view.setText(R.string.api_error);
-                    no_internet_text_view.setVisibility(View.VISIBLE);
-                }
-                else
-                    mAdapter.setMoviesData(response);
-            }
-        };
-        new FetchMoviesTask().execute(act,sort_by,responder);
+    private void showMovies()
+    {
+        no_internet_text_view.setVisibility(View.GONE);
+        movie_list_recycler_view.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public Loader<String> onCreateLoader(int id, final Bundle args) {
+        return new FetchMoviesLoader(this, args) ;
+    }
+
+    @Override
+    public void onLoaderReset(Loader loader) {
+        // No need to implement
+    }
+
+    @Override
+    public void onLoadFinished(Loader loader, Object data) {
+        if (null == data) {
+            showErrorMessage();
+        } else {
+            ArrayList<MovieObject> realdata = (ArrayList<MovieObject>) data;
+            mAdapter.setMoviesData(realdata);
+            showMovies();
+        }
     }
 
 
