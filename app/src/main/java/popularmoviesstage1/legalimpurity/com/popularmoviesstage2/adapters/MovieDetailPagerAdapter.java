@@ -21,13 +21,23 @@ public class MovieDetailPagerAdapter extends FragmentPagerAdapter {
         this.mo = mo;
     }
 
+    public void setUpdatedMovieObject(MovieObject mo)
+    {
+        this.mo = mo;
+        notifyDataSetChanged();
+    }
+
     @Override
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
                 return MainDetailFragment.newInstance(mo);
             case 1:
-                return ReviewsFragment.newInstance(mo);
+                // If trailers have loaded first than put it on second position.
+                if(mo.getReviewObjs() != null)
+                    return ReviewsFragment.newInstance(mo);
+                else
+                    return TrailersFragment.newInstance(mo);
             case 2:
                 return TrailersFragment.newInstance(mo);
         }
@@ -36,7 +46,15 @@ public class MovieDetailPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        // If both have loaded
+        if(mo.getTrailerVideoObjs() != null && mo.getReviewObjs() != null)
+            return 3;
+        // If one of them have loaded
+        else if(mo.getTrailerVideoObjs() != null || mo.getReviewObjs() != null)
+            return 2;
+        // If nothing has loaded
+        else
+            return 1;
     }
 
     @Override
@@ -45,10 +63,19 @@ public class MovieDetailPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return act.getString(R.string.movie_details);
             case 1:
-                return act.getString(R.string.reviews);
+                // If trailers have loaded first than put it on second position.
+                if(mo.getReviewObjs() != null)
+                    return act.getString(R.string.reviews);
+                else
+                    return act.getString(R.string.trailers);
             case 2:
                 return act.getString(R.string.trailers);
         }
         return null;
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
     }
 }

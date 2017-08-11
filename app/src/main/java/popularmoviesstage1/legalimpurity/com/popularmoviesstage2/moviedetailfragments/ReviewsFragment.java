@@ -26,9 +26,9 @@ import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.ReviewsLo
  * Created by rajatkhanna on 10/08/17.
  */
 
-public class ReviewsFragment extends Fragment implements LoaderManager.LoaderCallbacks {
+public class ReviewsFragment extends Fragment {
 
-    private static final int REVIEWS_DATA_LOADER = 23;
+//    private static final int REVIEWS_DATA_LOADER = 23;
 
     private static final String ARG_MOVIE_OBJECT = "ARG_MOVIE_OBJECT";
 
@@ -63,49 +63,44 @@ public class ReviewsFragment extends Fragment implements LoaderManager.LoaderCal
 
         review_list_recycler_view.setAdapter(reviewsListAdapter);
         review_list_recycler_view.setLayoutManager(new LinearLayoutManager(getActivity()));
-        loadReviewsData(getActivity());
+        if(mo.getReviewObjs() != null)
+            reviewsListAdapter.setReviewssData(mo.getReviewObjs());
+//        loadReviewsData(getActivity());
         return rootView;
     }
 
-    @Override
-    public Loader<String> onCreateLoader(int id, final Bundle args) {
-        return new ReviewsLoader(getContext(), args) ;
-    }
-
-    @Override
-    public void onLoaderReset(Loader loader) {
-        // No need to implement
-    }
-
-    @Override
-    public void onLoadFinished(Loader loader, Object data) {
-        if (null == data) {
-            showErrorMessage();
-        } else {
-            ArrayList<ReviewObject> realdata = (ArrayList<ReviewObject>) data;
-            reviewsListAdapter.setReviewssData(realdata);
-            showMovies();
-        }
-    }
-
-    private void loadReviewsData(FragmentActivity act) {
-        Bundle queryBundle = new Bundle();
-        queryBundle.putString(ReviewsLoader.MOVIE_API_ID, mo.getApiId()+"");
-
-        LoaderManager loaderManager = act.getSupportLoaderManager();
-        Loader<String> reviewsLoader = loaderManager.getLoader(REVIEWS_DATA_LOADER);
-        if (reviewsLoader == null) {
-            loaderManager.initLoader(REVIEWS_DATA_LOADER, queryBundle, this);
-        } else {
-            loaderManager.restartLoader(REVIEWS_DATA_LOADER, queryBundle, this);
-        }
-    }
-    private void showErrorMessage()
-    {
-    }
-
-    private void showMovies()
-    {
-    }
+//    @Override
+//    public Loader<String> onCreateLoader(int id, final Bundle args) {
+//        return new ReviewsLoader(getContext(), args) ;
+//    }
+//
+//    @Override
+//    public void onLoaderReset(Loader loader) {
+//        // No need to implement
+//    }
+//
+//    @Override
+//    public void onLoadFinished(Loader loader, Object data) {
+//        if (null == data) {
+//            showErrorMessage();
+//        } else {
+//            ArrayList<ReviewObject> realdata = (ArrayList<ReviewObject>) data;
+//            reviewsListAdapter.setReviewssData(realdata);
+//            showMovies();
+//        }
+//    }
+//
+//    private void loadReviewsData(FragmentActivity act) {
+//        Bundle queryBundle = new Bundle();
+//        queryBundle.putString(ReviewsLoader.MOVIE_API_ID, mo.getApiId()+"");
+//
+//        LoaderManager loaderManager = act.getSupportLoaderManager();
+//        Loader<String> reviewsLoader = loaderManager.getLoader(REVIEWS_DATA_LOADER);
+//        if (reviewsLoader == null) {
+//            loaderManager.initLoader(REVIEWS_DATA_LOADER, queryBundle, this);
+//        } else {
+//            loaderManager.restartLoader(REVIEWS_DATA_LOADER, queryBundle, this);
+//        }
+//    }
 
 }

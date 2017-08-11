@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,15 +17,25 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.adapters.MovieDetailPagerAdapter;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.ReviewObject;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.TrailerVideoObject;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.ReviewsLoader;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.TrailersLoader;
 
-public class MovieDetailActivity extends AppCompatActivity {
+public class MovieDetailActivity extends AppCompatActivity  implements LoaderManager.LoaderCallbacks
+{
 
     public static final String MOVIE_OBJECT_KEY = "0a46c76c98b80b4ed6befbe3760b28b1";
+
+    private static final int TRAILERS_DATA_LOADER = 24;
+    private static final int REVIEWS_DATA_LOADER = 23;
 
 
     @BindView(R.id.movie_poster) ImageView movie_poster;
@@ -34,6 +47,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     private MovieObject mo;
     private MovieDetailPagerAdapter movieDetailPagerAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +62,80 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
         setView(this);
         setFab(this);
+        loadReviewsAndTrailerData(this);
     }
+
+
+    @Override
+    public Loader<String> onCreateLoader(int id, final Bundle args) {
+        switch (id)
+        {
+            case TRAILERS_DATA_LOADER : return new TrailersLoader(this, args);
+            case REVIEWS_DATA_LOADER : return new ReviewsLoader(this, args);
+            default : return null;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader loader) {
+        // No need to implement
+    }
+
+    @Override
+    public void onLoadFinished(Loader loader, Object data) {
+        if (null == data) {
+            showErrorMessage();
+        } else
+        {
+            if(loader.getId() == TRAILERS_DATA_LOADER) {
+                ArrayList<TrailerVideoObject> trailersdata = (ArrayList<TrailerVideoObject>) data;
+                mo.setTrailerVideoObjs(trailersdata);
+            }
+            else if(loader.getId() == REVIEWS_DATA_LOADER)
+            {
+                ArrayList<ReviewObject> reviewsdata = (ArrayList<ReviewObject>) data;
+                mo.setReviewObjs(reviewsdata);
+            }
+            showMovies();
+        }
+    }
+
+    private void loadReviewsAndTrailerData(FragmentActivity act) {
+
+        LoaderManager loaderManager = act.getSupportLoaderManager();
+
+        Bundle reviewsBundle = new Bundle();
+        reviewsBundle.putString(ReviewsLoader.MOVIE_API_ID, mo.getApiId()+"");
+
+        Loader<String> reviewsLoader = loaderManager.getLoader(REVIEWS_DATA_LOADER);
+        if (reviewsLoader == null) {
+            loaderManager.initLoader(REVIEWS_DATA_LOADER, reviewsBundle, this);
+        } else {
+            loaderManager.restartLoader(REVIEWS_DATA_LOADER, reviewsBundle, this);
+        }
+
+        Bundle trailerBundle = new Bundle();
+        trailerBundle.putString(TrailersLoader.MOVIE_API_ID, mo.getApiId()+"");
+
+        Loader<String> trailersLoader = loaderManager.getLoader(TRAILERS_DATA_LOADER);
+        if (trailersLoader == null) {
+            loaderManager.initLoader(TRAILERS_DATA_LOADER, trailerBundle, this);
+        } else {
+            loaderManager.restartLoader(TRAILERS_DATA_LOADER, trailerBundle, this);
+        }
+
+    }
+
+    private void showErrorMessage()
+    {
+
+    }
+
+    private void showMovies()
+    {
+            movieDetailPagerAdapter.setUpdatedMovieObject(mo);
+    }
+
 
     private void setView(Activity act)
     {

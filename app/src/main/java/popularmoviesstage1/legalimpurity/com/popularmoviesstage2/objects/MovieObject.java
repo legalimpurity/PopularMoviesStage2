@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by rajatkhanna on 01/08/17.
@@ -14,8 +15,8 @@ public class MovieObject implements Parcelable {
     // Same as is from api, as they will always be Unique
     private long _id;
 
-    private ArrayList <ReviewObject> ReviewObjs;
-    private ArrayList <TrailerVideoObject> TrailerVideoObjs;
+    private ArrayList <ReviewObject> ReviewObjs = new ArrayList <ReviewObject>();
+    private ArrayList <TrailerVideoObject> TrailerVideoObjs = new ArrayList <TrailerVideoObject>();
 
 
     private long ApiId;
@@ -29,30 +30,32 @@ public class MovieObject implements Parcelable {
 
     public MovieObject(long ApiId, String orignalTitle, String moviePosterImageThumbnailUrl, String plotSynopsis, String userRating, String releaseDate) {
         this.ApiId = ApiId;
-        OrignalTitle = orignalTitle;
-        MoviePosterImageThumbnailUrl = moviePosterImageThumbnailUrl;
-        PlotSynopsis = plotSynopsis;
-        UserRating = userRating;
-        ReleaseDate = releaseDate;
+        this.OrignalTitle = orignalTitle;
+        this.MoviePosterImageThumbnailUrl = moviePosterImageThumbnailUrl;
+        this.PlotSynopsis = plotSynopsis;
+        this.UserRating = userRating;
+        this.ReleaseDate = releaseDate;
     }
 
     // To be used when creating object from db
     public MovieObject(long _id, long ApiId, String orignalTitle, String moviePosterImageThumbnailUrl, String plotSynopsis, String userRating, String releaseDate) {
         this._id = _id;
         this.ApiId = ApiId;
-        OrignalTitle = orignalTitle;
-        MoviePosterImageThumbnailUrl = moviePosterImageThumbnailUrl;
-        PlotSynopsis = plotSynopsis;
-        UserRating = userRating;
-        ReleaseDate = releaseDate;
+        this.OrignalTitle = orignalTitle;
+        this.MoviePosterImageThumbnailUrl = moviePosterImageThumbnailUrl;
+        this.PlotSynopsis = plotSynopsis;
+        this.UserRating = userRating;
+        this.ReleaseDate = releaseDate;
     }
+
+
 
     public long getApiId() {
         return ApiId;
     }
 
     public void setApiId(long apiId) {
-        ApiId = apiId;
+        this.ApiId = apiId;
     }
 
     public long get_id() {
@@ -68,15 +71,15 @@ public class MovieObject implements Parcelable {
     }
 
     public void setReviewObjs(ArrayList<ReviewObject> reviewObjs) {
-        ReviewObjs = reviewObjs;
+        this.ReviewObjs = reviewObjs;
     }
 
-    public ArrayList<TrailerVideoObject> getTrailerVIdeoObjs() {
+    public ArrayList<TrailerVideoObject> getTrailerVideoObjs() {
         return TrailerVideoObjs;
     }
 
-    public void setTrailerVIdeoObjs(ArrayList<TrailerVideoObject> TrailerVideoObjs) {
-        TrailerVideoObjs = TrailerVideoObjs;
+    public void setTrailerVideoObjs(ArrayList<TrailerVideoObject> TrailerVideoObjs) {
+        this.TrailerVideoObjs = TrailerVideoObjs;
     }
 
     public String getOrignalTitle() {
@@ -84,7 +87,7 @@ public class MovieObject implements Parcelable {
     }
 
     public void setOrignalTitle(String orignalTitle) {
-        OrignalTitle = orignalTitle;
+        this.OrignalTitle = orignalTitle;
     }
 
     public String getMoviePosterImageThumbnailUrl() {
@@ -92,7 +95,7 @@ public class MovieObject implements Parcelable {
     }
 
     public void setMoviePosterImageThumbnailUrl(String moviePosterImageThumbnailUrl) {
-        MoviePosterImageThumbnailUrl = moviePosterImageThumbnailUrl;
+        this.MoviePosterImageThumbnailUrl = moviePosterImageThumbnailUrl;
     }
 
     public String getPlotSynopsis() {
@@ -100,7 +103,7 @@ public class MovieObject implements Parcelable {
     }
 
     public void setPlotSynopsis(String plotSynopsis) {
-        PlotSynopsis = plotSynopsis;
+        this.PlotSynopsis = plotSynopsis;
     }
 
     public String getUserRating() {
@@ -140,9 +143,8 @@ public class MovieObject implements Parcelable {
         });
 
 
-//        How to write to arraylist of custom objects in Parcelable ?
-//        dest.readTypedList(ReviewObjs);
-//        dest.readTypedList(TrailerVideoObjs);
+        dest.writeTypedList(ReviewObjs);
+        dest.writeTypedList(TrailerVideoObjs);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -170,6 +172,11 @@ public class MovieObject implements Parcelable {
         in.readLongArray(data2);
         _id = data2[0];
         ApiId = data2[1];
+
+        ReviewObjs = new ArrayList<ReviewObject>();
+        in.readTypedList(ReviewObjs, ReviewObject.CREATOR);
+        in.readTypedList(TrailerVideoObjs, ReviewObject.CREATOR);
+
     }
 
 }

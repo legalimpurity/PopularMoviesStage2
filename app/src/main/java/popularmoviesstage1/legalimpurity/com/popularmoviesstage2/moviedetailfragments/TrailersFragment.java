@@ -5,16 +5,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,13 +18,12 @@ import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.adapters.Traile
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.listeners.TrailerClickListener;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.TrailerVideoObject;
-import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.TrailersLoader;
 
 import static popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils.YOUTUBE_VIDEO_URL;
 
-public class TrailersFragment extends Fragment implements LoaderManager.LoaderCallbacks {
+public class TrailersFragment extends Fragment{
 
-    private static final int TRAILERS_DATA_LOADER = 24;
+//    private static final int TRAILERS_DATA_LOADER = 24;
 
     private static final String ARG_MOVIE_OBJECT = "ARG_MOVIE_OBJECT";
 
@@ -68,46 +62,37 @@ public class TrailersFragment extends Fragment implements LoaderManager.LoaderCa
             }
         };
         trailersListAdapter = new TrailersListAdapter(getActivity(),tcl);
-
+        if (mo.getTrailerVideoObjs() != null)
+            trailersListAdapter.setReviewssData(mo.getTrailerVideoObjs());
         review_list_recycler_view.setAdapter(trailersListAdapter);
         review_list_recycler_view.setLayoutManager(new LinearLayoutManager(getActivity()));
-        loadReviewsData(getActivity());
+//        loadReviewsData(getActivity());
         return rootView;
     }
 
-    @Override
-    public Loader<String> onCreateLoader(int id, final Bundle args) {
-        return new TrailersLoader(getContext(), args) ;
-    }
+//    @Override
+//    public void onLoadFinished(Loader loader, Object data) {
+//        if (null == data) {
+//            showErrorMessage();
+//        } else {
+//            ArrayList<TrailerVideoObject> realdata = (ArrayList<TrailerVideoObject>) data;
+//            trailersListAdapter.setReviewssData(realdata);
+//            showTrailers();
+//        }
+//    }
 
-    @Override
-    public void onLoaderReset(Loader loader) {
-        // No need to implement
-    }
-
-    @Override
-    public void onLoadFinished(Loader loader, Object data) {
-        if (null == data) {
-            showErrorMessage();
-        } else {
-            ArrayList<TrailerVideoObject> realdata = (ArrayList<TrailerVideoObject>) data;
-            trailersListAdapter.setReviewssData(realdata);
-            showTrailers();
-        }
-    }
-
-    private void loadReviewsData(FragmentActivity act) {
-        Bundle queryBundle = new Bundle();
-        queryBundle.putString(TrailersLoader.MOVIE_API_ID, mo.getApiId()+"");
-
-        LoaderManager loaderManager = act.getSupportLoaderManager();
-        Loader<String> trailersLoader = loaderManager.getLoader(TRAILERS_DATA_LOADER);
-        if (trailersLoader == null) {
-            loaderManager.initLoader(TRAILERS_DATA_LOADER, queryBundle, this);
-        } else {
-            loaderManager.restartLoader(TRAILERS_DATA_LOADER, queryBundle, this);
-        }
-    }
+//    private void loadReviewsData(FragmentActivity act) {
+//        Bundle queryBundle = new Bundle();
+//        queryBundle.putString(TrailersLoader.MOVIE_API_ID, mo.getApiId()+"");
+//
+//        LoaderManager loaderManager = act.getSupportLoaderManager();
+//        Loader<String> trailersLoader = loaderManager.getLoader(TRAILERS_DATA_LOADER);
+//        if (trailersLoader == null) {
+//            loaderManager.initLoader(TRAILERS_DATA_LOADER, queryBundle, this);
+//        } else {
+//            loaderManager.restartLoader(TRAILERS_DATA_LOADER, queryBundle, this);
+//        }
+//    }
     private void showErrorMessage()
     {
     }
