@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.ReviewObject;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.TrailerVideoObject;
 
 
 public class JsonUtils {
@@ -73,6 +74,33 @@ public class JsonUtils {
         }
 
         return parsedMoviesData;
+    }
+
+    public static ArrayList<TrailerVideoObject> getTrailerObjectsFromJson(Context context, String reviewsJsonStr) throws JSONException {
+
+        final String REVIEWS_LIST = "results";
+
+        final String NAME_ATTRIBUTE = "name";
+        final String KEY_ATTRIBUTE = "key";
+        final String APIID_ATTRIBUTE = "id";
+
+        ArrayList<TrailerVideoObject> parsedTrailersData;
+
+        JSONObject movieJson = new JSONObject(reviewsJsonStr);
+
+        JSONArray moviesArray = movieJson.getJSONArray(REVIEWS_LIST);
+
+        parsedTrailersData = new ArrayList<>();
+
+        for (int i = 0; i < moviesArray.length(); i++) {
+            JSONObject movieJSONObj = moviesArray.getJSONObject(i);
+            parsedTrailersData.add(new TrailerVideoObject(i,movieJSONObj.getString(APIID_ATTRIBUTE),
+                    movieJSONObj.getString(NAME_ATTRIBUTE),
+                    movieJSONObj.getString(KEY_ATTRIBUTE)
+            ));
+        }
+
+        return parsedTrailersData;
     }
 
 }

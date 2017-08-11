@@ -20,6 +20,10 @@ public final class NetworkUtils {
     private static final String MOVIE_DATABASE_ROOT_URL = "https://api.themoviedb.org/3/movie/";
     public static final String MOVIES_IMAGE_URL = "https://image.tmdb.org/t/p/w185/";
 
+    public static final String YOUTUBE_THUMBNAIL_URL_PREFIX = "https://i.ytimg.com/vi/";
+    public static final String YOUTUBE_THUMBNAIL_URL_SUFFIX = "/maxresdefault.jpg";
+    public static final String YOUTUBE_VIDEO_URL = "https://www.youtube.com/watch?v=";
+
     private static final String REVIEWS_APPENDING_TAG = "/reviews";
     private static final String VIDEOS_APPENDING_TAG = "/videos";
 
@@ -43,7 +47,7 @@ public final class NetworkUtils {
         return url;
     }
 
-    public static URL buildMoviesUrl(String movieApiId) {
+    public static URL buildTrailersUrl(String movieApiId) {
         Uri builtUri = Uri.parse(MOVIE_DATABASE_ROOT_URL+movieApiId+VIDEOS_APPENDING_TAG).buildUpon()
                 .appendQueryParameter(API_KEY, API_KEY_VALUE)
                 .build();

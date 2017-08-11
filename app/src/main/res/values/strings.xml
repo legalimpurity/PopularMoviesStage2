@@ -21,5 +21,6 @@
     <string name="content_sample_vote_average">9.2</string>
     <string name="content_sample_release_date">1995-10-20</string>
     <string name="content_sample_author">Username</string>
+    <string name="content_sample_trailer_name">Trailer Name</string>
 
 </resources>

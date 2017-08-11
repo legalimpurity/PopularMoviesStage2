@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.R;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.moviedetailfragments.MainDetailFragment;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.moviedetailfragments.ReviewsFragment;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.moviedetailfragments.TrailersFragment;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 
 public class MovieDetailPagerAdapter extends FragmentPagerAdapter {
@@ -28,7 +29,7 @@ public class MovieDetailPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 return ReviewsFragment.newInstance(mo);
             case 2:
-                return MainDetailFragment.newInstance(mo);
+                return TrailersFragment.newInstance(mo);
         }
         return MainDetailFragment.newInstance(mo);
     }
@@ -44,9 +45,9 @@ public class MovieDetailPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return act.getString(R.string.movie_details);
             case 1:
-                return act.getString(R.string.trailers);
-            case 2:
                 return act.getString(R.string.reviews);
+            case 2:
+                return act.getString(R.string.trailers);
         }
         return null;
     }

@@ -4,17 +4,14 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center">
+    android:layout_gravity="center"
+    android:layout_margin="5dp">
     <TextView
         android:id="@+id/author"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/Base.TextAppearance.AppCompat.Medium"
+        style="@style/TextViewMovieDetailItemHeader"
         tools:text="@string/content_sample_author"/>
     <TextView
         android:id="@+id/review"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/Base.TextAppearance.AppCompat.Small"
+        style="@style/TextViewMovieDetailItemValue"
         tools:text="@string/content_sample_synopsis"/>
 </LinearLayout>

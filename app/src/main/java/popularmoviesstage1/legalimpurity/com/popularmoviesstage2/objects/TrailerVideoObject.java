@@ -10,11 +10,19 @@ import android.os.Parcelable;
 public class TrailerVideoObject implements Parcelable {
     private long _id;
 
+    private String ApiId;
     private String Name;
     private String YoutubeKey;
 
-    public TrailerVideoObject(long _id, String name, String youtubeKey) {
+    public TrailerVideoObject(long _id,String ApiId, String name, String youtubeKey) {
+        this.ApiId = ApiId;
         this._id = _id;
+        Name = name;
+        YoutubeKey = youtubeKey;
+    }
+
+    public TrailerVideoObject(String ApiId, String name, String youtubeKey) {
+        this.ApiId = ApiId;
         Name = name;
         YoutubeKey = youtubeKey;
     }
@@ -52,7 +60,8 @@ public class TrailerVideoObject implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[] {
                 this.Name,
-                this.YoutubeKey
+                this.YoutubeKey,
+                this.ApiId
         });
         dest.writeLongArray(new long[]{
                 this._id
@@ -70,10 +79,11 @@ public class TrailerVideoObject implements Parcelable {
     };
 
     public TrailerVideoObject(Parcel in){
-        String[] data = new String[2];
+        String[] data = new String[3];
         in.readStringArray(data);
         this.Name = data[0];
         this.YoutubeKey = data[1];
+        this.ApiId = data[2];
 
         long[] data2 = new long[1];
         in.readLongArray(data2);
