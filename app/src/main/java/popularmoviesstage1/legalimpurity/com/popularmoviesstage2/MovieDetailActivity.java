@@ -1,6 +1,7 @@
 package popularmoviesstage1.legalimpurity.com.popularmoviesstage2;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -18,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -25,7 +27,9 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.PicassoWrapper;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.adapters.MovieDetailPagerAdapter;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.contentprovider.MoviesContract;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.ReviewObject;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.TrailerVideoObject;
@@ -140,11 +144,10 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
 
     private void setView(Activity act)
     {
-        Picasso.with(act)
-                .load(NetworkUtils.MOVIES_IMAGE_URL+mo.getMoviePosterImageThumbnailUrl())
-                .placeholder(R.drawable.ic_local_movies_grey_24dp)
-                .into(movie_poster);
-
+        PicassoWrapper.UsePicassoWrapper(act,
+                NetworkUtils.MOVIES_IMAGE_URL_HIGHER_RESOLUTION+mo.getMoviePosterImageThumbnailUrl(),
+                movie_poster,
+                R.drawable.ic_local_movies_grey_24dp);
         toolbar_layout.setTitle(mo.getOrignalTitle());
 
         movieDetailPagerAdapter = new MovieDetailPagerAdapter(this,mo);
@@ -152,6 +155,8 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
         container.setAdapter(movieDetailPagerAdapter);
         tabs.setupWithViewPager(container);
     }
+
+
 
     private void shareData(final Activity act)
     {
@@ -196,11 +201,18 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
         {
             case R.id.action_share: shareData(this);
                 return true;
-            case R.id.action_bookmark:
+            case R.id.action_bookmark:saveMovieTODB(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void saveMovieTODB(final Activity act)
+    {
+        act.getContentResolver().insert(
+                MoviesContract.MoviesEntry.CONTENT_URI,
+                mo.getContentValues());
     }
 
 }

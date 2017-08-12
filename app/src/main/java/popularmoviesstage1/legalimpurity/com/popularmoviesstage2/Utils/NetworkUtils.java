@@ -19,6 +19,7 @@ public final class NetworkUtils {
 
     private static final String MOVIE_DATABASE_ROOT_URL = "https://api.themoviedb.org/3/movie/";
     public static final String MOVIES_IMAGE_URL = "https://image.tmdb.org/t/p/w185/";
+    public static final String MOVIES_IMAGE_URL_HIGHER_RESOLUTION = "https://image.tmdb.org/t/p/w500/";
 
     public static final String YOUTUBE_THUMBNAIL_URL_PREFIX = "https://i.ytimg.com/vi/";
     public static final String YOUTUBE_THUMBNAIL_URL_SUFFIX = "/maxresdefault.jpg";

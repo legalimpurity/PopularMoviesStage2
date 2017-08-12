@@ -7,12 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.R;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.PicassoWrapper;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.listeners.MovieClickListener;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 
@@ -73,11 +75,16 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
                     clicker.onMovieCLick(mo);
                 }
             });
-            Picasso
-                    .with(act)
-                    .load(NetworkUtils.MOVIES_IMAGE_URL+mo.getMoviePosterImageThumbnailUrl())
-                    .placeholder(R.drawable.ic_local_movies_grey_24dp)
-                    .into(posterImage);
+            PicassoWrapper.UsePicassoWrapper(act,
+                    NetworkUtils.MOVIES_IMAGE_URL+mo.getMoviePosterImageThumbnailUrl(),
+                    posterImage,
+                    R.drawable.ic_local_movies_grey_24dp);
+//            Picasso
+//                    .with(act)
+//                    .load(NetworkUtils.MOVIES_IMAGE_URL+mo.getMoviePosterImageThumbnailUrl())
+//                    .placeholder()
+//                    .networkPolicy(NetworkPolicy.OFFLINE)
+//                    .into(posterImage);
         }
     }
 }

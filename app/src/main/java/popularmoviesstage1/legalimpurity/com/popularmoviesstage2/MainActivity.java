@@ -5,8 +5,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +28,7 @@ import butterknife.ButterKnife;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkStateReceiver;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.adapters.MovieListAdapter;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.contentprovider.MoviesContract;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.listeners.MovieClickListener;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.tasks.FetchMoviesLoader;
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
     private String selectedApi = "popular";
 
     private static final int MOVIES_DATA_LOADER = 22;
+    private static final int OFFLINE_BOOKMARKS_DATA_LOADER = 23;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +105,6 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
 
         movie_list_recycler_view.setHasFixedSize(true);
 
-//        movies_list = dummyData();
         movies_list = new ArrayList<MovieObject>();
         mAdapter = new MovieListAdapter(act,movies_list, new MovieClickListener() {
             @Override
@@ -118,15 +122,27 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
     }
 
     private void loadMoviesData(Activity act, String sort_by) {
-        Bundle queryBundle = new Bundle();
-        queryBundle.putString(FetchMoviesLoader.SORT_BY_PARAM, sort_by);
-
         LoaderManager loaderManager = getSupportLoaderManager();
-        Loader<String> moviesLoader = loaderManager.getLoader(MOVIES_DATA_LOADER);
-        if (moviesLoader == null) {
-            loaderManager.initLoader(MOVIES_DATA_LOADER, queryBundle, this);
-        } else {
-            loaderManager.restartLoader(MOVIES_DATA_LOADER, queryBundle, this);
+        Bundle queryBundle = new Bundle();
+
+        if(sort_by.equalsIgnoreCase("bookmarks"))
+        {
+            Loader moviesLoader = loaderManager.getLoader(OFFLINE_BOOKMARKS_DATA_LOADER);
+            if (moviesLoader == null) {
+                loaderManager.initLoader(OFFLINE_BOOKMARKS_DATA_LOADER, queryBundle, this);
+            } else {
+                loaderManager.restartLoader(OFFLINE_BOOKMARKS_DATA_LOADER, queryBundle, this);
+            }
+        }
+        else {
+            queryBundle.putString(FetchMoviesLoader.SORT_BY_PARAM, sort_by);
+
+            Loader moviesLoader = loaderManager.getLoader(MOVIES_DATA_LOADER);
+            if (moviesLoader == null) {
+                loaderManager.initLoader(MOVIES_DATA_LOADER, queryBundle, this);
+            } else {
+                loaderManager.restartLoader(MOVIES_DATA_LOADER, queryBundle, this);
+            }
         }
     }
 
@@ -144,8 +160,20 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
     }
 
     @Override
-    public Loader<String> onCreateLoader(int id, final Bundle args) {
-        return new FetchMoviesLoader(this, args) ;
+    public Loader onCreateLoader(int id, final Bundle args) {
+        switch(id)
+        {
+            case MOVIES_DATA_LOADER:
+                return new FetchMoviesLoader(this, args);
+            case OFFLINE_BOOKMARKS_DATA_LOADER:
+                return new CursorLoader(this,
+                MoviesContract.MoviesEntry.CONTENT_URI,
+                MoviesContract.MOVIES_PROJECTION,
+                null,
+                null,
+                null);
+            default:return new FetchMoviesLoader(this, args);
+        }
     }
 
     @Override
@@ -158,7 +186,23 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
         if (null == data) {
             showErrorMessage();
         } else {
-            ArrayList<MovieObject> realdata = (ArrayList<MovieObject>) data;
+            ArrayList<MovieObject> realdata;
+
+            if(loader.getId() == MOVIES_DATA_LOADER)
+            {
+                realdata = (ArrayList<MovieObject>) data;
+            }
+            else
+            {
+                Cursor mCursor = (Cursor) data;
+                realdata = new ArrayList<MovieObject>();
+                for(int i = 0; i < mCursor.getCount(); i++)
+                {
+                    mCursor.moveToPosition(i);
+                    realdata.add(new MovieObject(mCursor));
+                }
+            }
+
             mAdapter.setMoviesData(realdata);
             showMovies();
         }
@@ -177,7 +221,7 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
         int id = item.getItemId();
 
         if (id == R.id.change_sort_order) {
-            CharSequence colors[] = new CharSequence[] {getString(R.string.most_popular), getString(R.string.highest_rated)};
+            CharSequence colors[] = new CharSequence[] {getString(R.string.most_popular), getString(R.string.highest_rated), getString(R.string.bookmarks)};
 
             final Activity act = this;
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -185,15 +229,19 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
             builder.setItems(colors, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if(which==0)
+                    switch (which)
                     {
-                        selectedApi = "popular";
-                        loadMoviesData(act,selectedApi);
-                    }
-                    else
-                    {
-                        selectedApi = "top_rated";
-                        loadMoviesData(act,selectedApi);
+                        case 0: selectedApi = "popular";
+                            loadMoviesData(act,selectedApi);
+                            break;
+                        case 1: selectedApi = "top_rated";
+                            loadMoviesData(act,selectedApi);
+                            break;
+                        case 2: selectedApi = "bookmarks";
+                            loadMoviesData(act,selectedApi);
+                            break;
+                        default:selectedApi = "bookmarks";
+                            loadMoviesData(act,selectedApi);
                     }
                 }
             });

@@ -28,6 +28,26 @@ public class MoviesContract {
         public static final String COLUMN_RELEASE_DATE = "release_date";
     }
 
+    public static final String[] MOVIES_PROJECTION = {
+            MoviesEntry.COLUMN_API_ID,
+            MoviesEntry.COLUMN_ORIGNAL_TITLE,
+            MoviesEntry.COLUMN_POSTER_URL,
+            MoviesEntry.COLUMN_PLOT_SYNOPSIS,
+            MoviesEntry.COLUMN_USER_RATING,
+            MoviesEntry.COLUMN_RELEASE_DATE
+    };
+
+
+    public static final class MOVIES_PROJECTION_INDEXES {
+        public static final int COLUMN_API_ID_POSITION = 0;
+        public static final int COLUMN_ORIGNAL_TITLE_POSITION = 1;
+        public static final int COLUMN_POSTER_URL_POSITION = 2;
+        public static final int COLUMN_PLOT_SYNOPSIS_POSITION = 3;
+        public static final int COLUMN_USER_RATING_POSITION = 4;
+        public static final int COLUMN_RELEASE_DATE_POSITION = 5;
+    }
+
+
     public static final String PATH_REVIEWS = "reviews";
 
     public static final class ReviewEntry implements BaseColumns {

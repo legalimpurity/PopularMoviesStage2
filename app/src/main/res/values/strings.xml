@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">TheMovieDBApp</string>
-    <string name="change_sort_order">Change Sort Order</string>
-    <string name="pick_an_order">Pick an Sorting Order</string>
+    <string name="change_sort_order">Navigate</string>
+    <string name="pick_an_order">Pick an sorting order or check bookmarks</string>
     <string name="most_popular">Most Popular</string>
     <string name="highest_rated">Highest Rated</string>
+    <string name="bookmarks">Bookmarks</string>
     <string name="release_date">Release Date</string>
     <string name="vote_average">Vote Average</string>
     <string name="plot_synopsis">Plot Synopsis</string>

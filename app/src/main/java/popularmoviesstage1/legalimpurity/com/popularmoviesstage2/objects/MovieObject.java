@@ -1,10 +1,14 @@
 package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.contentprovider.MoviesContract;
 
 /**
  * Created by rajatkhanna on 01/08/17.
@@ -17,7 +21,6 @@ public class MovieObject implements Parcelable {
 
     private ArrayList <ReviewObject> ReviewObjs = new ArrayList <ReviewObject>();
     private ArrayList <TrailerVideoObject> TrailerVideoObjs = new ArrayList <TrailerVideoObject>();
-
 
     private long ApiId;
     private String OrignalTitle;
@@ -176,7 +179,29 @@ public class MovieObject implements Parcelable {
         ReviewObjs = new ArrayList<ReviewObject>();
         in.readTypedList(ReviewObjs, ReviewObject.CREATOR);
         in.readTypedList(TrailerVideoObjs, ReviewObject.CREATOR);
+    }
 
+    public MovieObject(Cursor mCursor){
+        this.ApiId = mCursor.getLong(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_API_ID_POSITION);
+
+        this.OrignalTitle = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_ORIGNAL_TITLE_POSITION);
+        this.MoviePosterImageThumbnailUrl = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_POSTER_URL_POSITION);
+        this.PlotSynopsis = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_PLOT_SYNOPSIS_POSITION);
+        this.UserRating = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_USER_RATING_POSITION);
+        this.ReleaseDate = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_USER_RATING_POSITION);
+    }
+
+
+    public ContentValues getContentValues() {
+        ContentValues movieObjectValues = new ContentValues();
+        movieObjectValues.put(MoviesContract.MoviesEntry.COLUMN_API_ID, ApiId);
+
+        movieObjectValues.put(MoviesContract.MoviesEntry.COLUMN_ORIGNAL_TITLE, OrignalTitle);
+        movieObjectValues.put(MoviesContract.MoviesEntry.COLUMN_PLOT_SYNOPSIS, PlotSynopsis);
+        movieObjectValues.put(MoviesContract.MoviesEntry.COLUMN_POSTER_URL, MoviePosterImageThumbnailUrl);
+        movieObjectValues.put(MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE, ReleaseDate);
+        movieObjectValues.put(MoviesContract.MoviesEntry.COLUMN_USER_RATING, UserRating);
+        return movieObjectValues;
     }
 
 }
