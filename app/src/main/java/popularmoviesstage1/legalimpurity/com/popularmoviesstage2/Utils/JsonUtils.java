@@ -1,13 +1,18 @@
 package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.util.SparseArray;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.contentprovider.MovieDbHelper;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.contentprovider.MoviesContract;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.MovieObject;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.ReviewObject;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.TrailerVideoObject;
@@ -35,14 +40,38 @@ public class JsonUtils {
 
         parsedMoviesData = new ArrayList<>();
 
+        MovieDbHelper movieDbHelper = new MovieDbHelper(context);
+
+
+        HashSet<Long> bookmarked_ids = new HashSet<Long>();
+        // Get all bookmarks
+        Cursor cursor = movieDbHelper.getReadableDatabase().query(
+                MoviesContract.MoviesEntry.TABLE_NAME,
+                new String[]{MoviesContract.MoviesEntry.COLUMN_API_ID},
+                null,
+                null,
+                null,
+                null,
+                null);
+        while (cursor.moveToNext()) {
+            bookmarked_ids.add(cursor.getLong(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_API_ID_POSITION));
+        }
+
         for (int i = 0; i < moviesArray.length(); i++) {
             JSONObject movieJSONObj = moviesArray.getJSONObject(i);
-            parsedMoviesData.add(new MovieObject(movieJSONObj.getLong(APIID_ATTRIBUTE),
+            long apiid = movieJSONObj.getLong(APIID_ATTRIBUTE);
+            boolean isBookmarked = false;
+
+            if(bookmarked_ids.contains(apiid))
+                isBookmarked = true;
+
+            parsedMoviesData.add(new MovieObject(apiid,
                     movieJSONObj.getString(TITLE_ATTRIBUTE),
                     movieJSONObj.getString(POSTER_URL),
                     movieJSONObj.getString(PLOT_SYNOPSIS),
                     movieJSONObj.getString(USER_RATING),
-                    movieJSONObj.getString(RELEASE_DATE)
+                    movieJSONObj.getString(RELEASE_DATE),
+                    isBookmarked
             ));
         }
 
@@ -94,7 +123,7 @@ public class JsonUtils {
 
         for (int i = 0; i < moviesArray.length(); i++) {
             JSONObject movieJSONObj = moviesArray.getJSONObject(i);
-            parsedTrailersData.add(new TrailerVideoObject(i,movieJSONObj.getString(APIID_ATTRIBUTE),
+            parsedTrailersData.add(new TrailerVideoObject(movieJSONObj.getString(APIID_ATTRIBUTE),
                     movieJSONObj.getString(NAME_ATTRIBUTE),
                     movieJSONObj.getString(KEY_ATTRIBUTE)
             ));

@@ -79,12 +79,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
                     NetworkUtils.MOVIES_IMAGE_URL+mo.getMoviePosterImageThumbnailUrl(),
                     posterImage,
                     R.drawable.ic_local_movies_grey_24dp);
-//            Picasso
-//                    .with(act)
-//                    .load(NetworkUtils.MOVIES_IMAGE_URL+mo.getMoviePosterImageThumbnailUrl())
-//                    .placeholder()
-//                    .networkPolicy(NetworkPolicy.OFFLINE)
-//                    .into(posterImage);
         }
     }
 }

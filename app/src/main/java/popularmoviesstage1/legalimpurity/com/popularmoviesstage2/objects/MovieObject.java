@@ -16,12 +16,11 @@ import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.contentprovider
 
 public class MovieObject implements Parcelable {
 
-    // Same as is from api, as they will always be Unique
-    private long _id;
 
     private ArrayList <ReviewObject> ReviewObjs = new ArrayList <ReviewObject>();
     private ArrayList <TrailerVideoObject> TrailerVideoObjs = new ArrayList <TrailerVideoObject>();
 
+    // Same as is from api, as they will always be Unique
     private long ApiId;
     private String OrignalTitle;
     private String MoviePosterImageThumbnailUrl;
@@ -29,29 +28,27 @@ public class MovieObject implements Parcelable {
     private String UserRating;
     private String ReleaseDate;
 
+    private boolean bookmarked;
+
     // To be used when creating object from api
 
-    public MovieObject(long ApiId, String orignalTitle, String moviePosterImageThumbnailUrl, String plotSynopsis, String userRating, String releaseDate) {
+    public MovieObject(long ApiId, String orignalTitle, String moviePosterImageThumbnailUrl, String plotSynopsis, String userRating, String releaseDate, boolean bookmarked) {
         this.ApiId = ApiId;
         this.OrignalTitle = orignalTitle;
         this.MoviePosterImageThumbnailUrl = moviePosterImageThumbnailUrl;
         this.PlotSynopsis = plotSynopsis;
         this.UserRating = userRating;
         this.ReleaseDate = releaseDate;
+        this.bookmarked = bookmarked;
     }
 
-    // To be used when creating object from db
-    public MovieObject(long _id, long ApiId, String orignalTitle, String moviePosterImageThumbnailUrl, String plotSynopsis, String userRating, String releaseDate) {
-        this._id = _id;
-        this.ApiId = ApiId;
-        this.OrignalTitle = orignalTitle;
-        this.MoviePosterImageThumbnailUrl = moviePosterImageThumbnailUrl;
-        this.PlotSynopsis = plotSynopsis;
-        this.UserRating = userRating;
-        this.ReleaseDate = releaseDate;
+    public boolean isBookmarked() {
+        return bookmarked;
     }
 
-
+    public void setBookmarked(boolean bookmarked) {
+        this.bookmarked = bookmarked;
+    }
 
     public long getApiId() {
         return ApiId;
@@ -59,14 +56,6 @@ public class MovieObject implements Parcelable {
 
     public void setApiId(long apiId) {
         this.ApiId = apiId;
-    }
-
-    public long get_id() {
-        return _id;
-    }
-
-    public void set_id(long _id) {
-        this._id = _id;
     }
 
     public ArrayList<ReviewObject> getReviewObjs() {
@@ -141,10 +130,12 @@ public class MovieObject implements Parcelable {
         });
 
         dest.writeLongArray(new long[] {
-                this._id,
                 this.ApiId
         });
 
+        dest.writeBooleanArray(new boolean[]{
+                bookmarked
+        });
 
         dest.writeTypedList(ReviewObjs);
         dest.writeTypedList(TrailerVideoObjs);
@@ -170,11 +161,14 @@ public class MovieObject implements Parcelable {
         this.UserRating = data[3];
         this.ReleaseDate = data[4];
 
-        long[] data2 = new long[2];
+        long[] data2 = new long[1];
 
         in.readLongArray(data2);
-        _id = data2[0];
-        ApiId = data2[1];
+        ApiId = data2[0];
+
+        boolean[] data3 = new boolean[1];
+        in.readBooleanArray(data3);
+        bookmarked = data3[0];
 
         ReviewObjs = new ArrayList<ReviewObject>();
         in.readTypedList(ReviewObjs, ReviewObject.CREATOR);
@@ -189,6 +183,8 @@ public class MovieObject implements Parcelable {
         this.PlotSynopsis = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_PLOT_SYNOPSIS_POSITION);
         this.UserRating = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_USER_RATING_POSITION);
         this.ReleaseDate = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_USER_RATING_POSITION);
+        // If object is coming from DB, it is obviosuly bookmarked
+        this.bookmarked = true;
     }
 
 

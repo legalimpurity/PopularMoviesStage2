@@ -18,7 +18,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
 
     // Constructor
-    MovieDbHelper(Context context) {
+    public MovieDbHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
     }
 
@@ -30,8 +30,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         final String CREATE_TABLE_MOVIES = "CREATE TABLE "  + MoviesContract.MoviesEntry.TABLE_NAME + " (" +
-                MoviesContract.MoviesEntry._ID                + " INTEGER PRIMARY KEY, " +
-                MoviesContract.MoviesEntry.COLUMN_API_ID                + " INTEGER NOT NULL, " +
+                MoviesContract.MoviesEntry.COLUMN_API_ID + " INTEGER PRIMARY KEY NOT NULL, " +
                 MoviesContract.MoviesEntry.COLUMN_ORIGNAL_TITLE + " TEXT NOT NULL, " +
                 MoviesContract.MoviesEntry.COLUMN_POSTER_URL + " TEXT NOT NULL, " +
                 MoviesContract.MoviesEntry.COLUMN_PLOT_SYNOPSIS + " TEXT NOT NULL, " +
@@ -40,15 +39,13 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 ");";
 
         final String CREATE_TABLE_REVIEWS = "CREATE TABLE "  + MoviesContract.ReviewEntry.TABLE_NAME + " (" +
-                MoviesContract.ReviewEntry._ID                + " INTEGER PRIMARY KEY, " +
-                MoviesContract.ReviewEntry.COLUMN_API_ID                + " INTEGER NOT NULL, " +
+                MoviesContract.ReviewEntry.COLUMN_API_ID + " INTEGER PRIMARY KEY NOT NULL, " +
                 MoviesContract.ReviewEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
                 MoviesContract.ReviewEntry.COLUMN_CONTENT + " TEXT NOT NULL" +
                 ");";
 
         final String CREATE_TABLE_TRAILER_VIDEOS = "CREATE TABLE "  + MoviesContract.TrailerVideosEntry.TABLE_NAME + " (" +
-                MoviesContract.TrailerVideosEntry._ID                + " INTEGER PRIMARY KEY, " +
-                MoviesContract.TrailerVideosEntry.COLUMN_API_ID                + " INTEGER NOT NULL, " +
+                MoviesContract.TrailerVideosEntry.COLUMN_API_ID + " INTEGER PRIMARY KEY NOT NULL, " +
                 MoviesContract.TrailerVideosEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 MoviesContract.TrailerVideosEntry.COLUMN_YOUTUBE_KEY + " TEXT NOT NULL" +
                 ");";

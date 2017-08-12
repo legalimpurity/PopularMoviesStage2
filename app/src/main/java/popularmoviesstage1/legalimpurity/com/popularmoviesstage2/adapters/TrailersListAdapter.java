@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.R;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.PicassoWrapper;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.listeners.ReviewClickListener;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.listeners.TrailerClickListener;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.ReviewObject;
@@ -77,11 +78,11 @@ public class TrailersListAdapter extends RecyclerView.Adapter<TrailersListAdapte
         void bind(final TrailerVideoObject to)
         {
             trailerName.setText(to.getName());
-            Picasso
-                    .with(act)
-                    .load(NetworkUtils.YOUTUBE_THUMBNAIL_URL_PREFIX+to.getYoutubeKey()+NetworkUtils.YOUTUBE_THUMBNAIL_URL_SUFFIX)
-                    .placeholder(R.mipmap.movie_trailer)
-                    .into(thumbnail);
+            PicassoWrapper.UsePicassoWrapper(act,
+                    NetworkUtils.YOUTUBE_THUMBNAIL_URL_PREFIX+to.getYoutubeKey()+NetworkUtils.YOUTUBE_THUMBNAIL_URL_SUFFIX,
+                    thumbnail,
+                    R.mipmap.movie_trailer);
+
             root_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

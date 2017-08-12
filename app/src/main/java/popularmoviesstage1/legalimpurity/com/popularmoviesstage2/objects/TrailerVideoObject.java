@@ -8,31 +8,15 @@ import android.os.Parcelable;
  */
 
 public class TrailerVideoObject implements Parcelable {
-    private long _id;
 
     private String ApiId;
     private String Name;
     private String YoutubeKey;
 
-    public TrailerVideoObject(long _id,String ApiId, String name, String youtubeKey) {
-        this.ApiId = ApiId;
-        this._id = _id;
-        Name = name;
-        YoutubeKey = youtubeKey;
-    }
-
     public TrailerVideoObject(String ApiId, String name, String youtubeKey) {
         this.ApiId = ApiId;
         Name = name;
         YoutubeKey = youtubeKey;
-    }
-
-    public long get_id() {
-        return _id;
-    }
-
-    public void set_id(long _id) {
-        this._id = _id;
     }
 
     public String getName() {
@@ -63,9 +47,6 @@ public class TrailerVideoObject implements Parcelable {
                 this.YoutubeKey,
                 this.ApiId
         });
-        dest.writeLongArray(new long[]{
-                this._id
-        });
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -84,9 +65,5 @@ public class TrailerVideoObject implements Parcelable {
         this.Name = data[0];
         this.YoutubeKey = data[1];
         this.ApiId = data[2];
-
-        long[] data2 = new long[1];
-        in.readLongArray(data2);
-        this._id = data2[0];
     }
 }

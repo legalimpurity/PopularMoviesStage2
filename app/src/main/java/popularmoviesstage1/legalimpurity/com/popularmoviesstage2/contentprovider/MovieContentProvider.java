@@ -142,19 +142,15 @@ public class MovieContentProvider extends ContentProvider {
 
         int match = sUriMatcher.match(uri);
         int tasksDeleted;
-        String id;
         switch (match) {
-            case MOVIE_WITH_ID:
-                id = uri.getPathSegments().get(1);
-                tasksDeleted = db.delete(MoviesContract.MoviesEntry.TABLE_NAME, "_id=?", new String[]{id});
+            case MOVIES:
+                tasksDeleted = db.delete(MoviesContract.MoviesEntry.TABLE_NAME, selection, selectionArgs);
                 break;
-            case REVIEW_WITH_ID:
-                id = uri.getPathSegments().get(1);
-                tasksDeleted = db.delete(MoviesContract.ReviewEntry.TABLE_NAME, "_id=?", new String[]{id});
+            case REVIEWS:
+                tasksDeleted = db.delete(MoviesContract.ReviewEntry.TABLE_NAME, selection, selectionArgs);
                 break;
-            case TRAILER_WITH_ID:
-                id = uri.getPathSegments().get(1);
-                tasksDeleted = db.delete(MoviesContract.TrailerVideosEntry.TABLE_NAME, "_id=?", new String[]{id});
+            case TRAILERS:
+                tasksDeleted = db.delete(MoviesContract.TrailerVideosEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

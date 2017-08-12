@@ -54,6 +54,9 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
     private MovieObject mo;
     private MovieDetailPagerAdapter movieDetailPagerAdapter;
 
+    private Menu menu;
+
+    private boolean bookmarked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +194,8 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.movie_detail_menu, menu);
+        this.menu = menu;
+        checkBookmark();
         return true;
     }
 
@@ -201,18 +206,42 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
         {
             case R.id.action_share: shareData(this);
                 return true;
-            case R.id.action_bookmark:saveMovieTODB(this);
+            case R.id.action_bookmark:toggleBookmark(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void saveMovieTODB(final Activity act)
+    private void toggleBookmark(final Activity act)
     {
-        act.getContentResolver().insert(
+        if(bookmarked)
+            act.getContentResolver().delete(MoviesContract.MoviesEntry.CONTENT_URI, MoviesContract.MoviesEntry.COLUMN_API_ID + " = ? ",new String[]{String.valueOf(mo.getApiId())});
+        else
+            act.getContentResolver().insert(
                 MoviesContract.MoviesEntry.CONTENT_URI,
                 mo.getContentValues());
+
+        bookmarked = !bookmarked;
+        updateMenuTitles();
+    }
+
+
+    private void updateMenuTitles() {
+        MenuItem bookmarkMenuItem = menu.findItem(R.id.action_bookmark);
+        if (bookmarked) {
+            bookmarkMenuItem.setTitle(R.string.action_bookmark);
+            bookmarkMenuItem.setIcon(R.drawable.ic_bookmark_white_24dp);
+        } else {
+            bookmarkMenuItem.setTitle(R.string.action_not_bookmark);
+            bookmarkMenuItem.setIcon(R.drawable.ic_bookmark_border_white_24dp);
+        }
+    }
+
+    private void checkBookmark()
+    {
+        bookmarked = mo.isBookmarked();
+        updateMenuTitles();
     }
 
 }
