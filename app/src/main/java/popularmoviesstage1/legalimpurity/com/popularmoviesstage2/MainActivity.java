@@ -11,10 +11,12 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.MyPreferences;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkStateReceiver;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.Utils.NetworkUtils;
 import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.adapters.MovieListAdapter;
@@ -37,11 +40,16 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
 
     @BindView(R.id.movie_list_recycler_view) RecyclerView movie_list_recycler_view;
     @BindView(R.id.no_internet_text_view) TextView no_internet_text_view;
+    private ActionBar ab;
 
     private MovieListAdapter mAdapter;
     private ArrayList<MovieObject> movies_list;
 
-    private String selectedApi = "popular";
+    final String optionValues[] = new String[] {"popular", "top_rated", "bookmarks"};
+    private CharSequence options[];
+
+    private String selectedApi = optionValues[0];
+    private int selectedApi_code = 0;
 
     private static final int MOVIES_DATA_LOADER = 22;
     private static final int OFFLINE_BOOKMARKS_DATA_LOADER = 23;
@@ -53,15 +61,30 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
         ButterKnife.bind(this);
         findViews(this);
         setAdapter(this);
-        selectedApi = "popular";
+
+        options = new CharSequence[] {getString(R.string.most_popular), getString(R.string.highest_rated), getString(R.string.bookmarks)};
+        selectedApi_code = MyPreferences.getInt(this,MyPreferences.PROPERTY_SORTING_ORDER);
+
+        if(selectedApi_code == -1)
+            selectedApi_code = 0;
+            selectedApi=optionValues[selectedApi_code];
+
+        ab = getSupportActionBar();
+        ab.setTitle(options[selectedApi_code]);
+
         if(NetworkUtils.isNetworkAvailable(this)) {
             // Will be called from networkAvailable Function
             //  loadMoviesData(this, selectedApi);
         }
         else
         {
-            movie_list_recycler_view.setVisibility(View.GONE);
-            no_internet_text_view.setVisibility(View.VISIBLE);
+            // Movies gotta load wihtout interner also
+            if(selectedApi.equalsIgnoreCase(optionValues[2]))
+                loadMoviesData(this,selectedApi);
+            else {
+                no_internet_text_view.setText(R.string.no_internet);
+                showErrorMessage();
+            }
         }
         addNetworkStateReceiver(this);
     }
@@ -72,9 +95,7 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
         networkStateReceiver.addListener(new NetworkStateReceiver.NetworkStateReceiverListener() {
             @Override
             public void networkAvailable() {
-                movie_list_recycler_view.setVisibility(View.VISIBLE);
-                no_internet_text_view.setText(R.string.no_internet);
-                no_internet_text_view.setVisibility(View.GONE);
+                showMovies();
                 loadMoviesData(act,selectedApi);
             }
 
@@ -135,20 +156,26 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
             }
         }
         else {
-            queryBundle.putString(FetchMoviesLoader.SORT_BY_PARAM, sort_by);
+            if(NetworkUtils.isNetworkAvailable(this)) {
+                queryBundle.putString(FetchMoviesLoader.SORT_BY_PARAM, sort_by);
 
-            Loader moviesLoader = loaderManager.getLoader(MOVIES_DATA_LOADER);
-            if (moviesLoader == null) {
-                loaderManager.initLoader(MOVIES_DATA_LOADER, queryBundle, this);
-            } else {
-                loaderManager.restartLoader(MOVIES_DATA_LOADER, queryBundle, this);
+                Loader moviesLoader = loaderManager.getLoader(MOVIES_DATA_LOADER);
+                if (moviesLoader == null) {
+                    loaderManager.initLoader(MOVIES_DATA_LOADER, queryBundle, this);
+                } else {
+                    loaderManager.restartLoader(MOVIES_DATA_LOADER, queryBundle, this);
+                }
+            }
+            else
+            {
+                no_internet_text_view.setText(R.string.no_internet);
+                showErrorMessage();
             }
         }
     }
 
     private void showErrorMessage()
     {
-        no_internet_text_view.setText(R.string.api_error);
         no_internet_text_view.setVisibility(View.VISIBLE);
         movie_list_recycler_view.setVisibility(View.GONE);
     }
@@ -184,6 +211,7 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
     @Override
     public void onLoadFinished(Loader loader, Object data) {
         if (null == data) {
+            no_internet_text_view.setText(R.string.api_error);
             showErrorMessage();
         } else {
             ArrayList<MovieObject> realdata;
@@ -191,6 +219,7 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
             if(loader.getId() == MOVIES_DATA_LOADER)
             {
                 realdata = (ArrayList<MovieObject>) data;
+                no_internet_text_view.setText(R.string.change_order_zero);
             }
             else
             {
@@ -201,10 +230,15 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
                     mCursor.moveToPosition(i);
                     realdata.add(new MovieObject(mCursor));
                 }
+                no_internet_text_view.setText(R.string.bookmarks_zero);
             }
 
             mAdapter.setMoviesData(realdata);
-            showMovies();
+
+            if(realdata.size() == 0)
+                showErrorMessage();
+            else
+                showMovies();
         }
     }
 
@@ -221,34 +255,24 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
         int id = item.getItemId();
 
         if (id == R.id.change_sort_order) {
-            CharSequence colors[] = new CharSequence[] {getString(R.string.most_popular), getString(R.string.highest_rated), getString(R.string.bookmarks)};
+
 
             final Activity act = this;
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.pick_an_order);
-            builder.setItems(colors, new DialogInterface.OnClickListener() {
+            builder.setItems(options, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    switch (which)
-                    {
-                        case 0: selectedApi = "popular";
-                            loadMoviesData(act,selectedApi);
-                            break;
-                        case 1: selectedApi = "top_rated";
-                            loadMoviesData(act,selectedApi);
-                            break;
-                        case 2: selectedApi = "bookmarks";
-                            loadMoviesData(act,selectedApi);
-                            break;
-                        default:selectedApi = "bookmarks";
-                            loadMoviesData(act,selectedApi);
-                    }
+                    selectedApi_code = which;
+                    selectedApi = optionValues[selectedApi_code];
+                    MyPreferences.setInt(act,MyPreferences.PROPERTY_SORTING_ORDER,selectedApi_code);
+                    ab.setTitle(options[selectedApi_code]);
+                    loadMoviesData(act,selectedApi);
                 }
             });
             builder.show();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
