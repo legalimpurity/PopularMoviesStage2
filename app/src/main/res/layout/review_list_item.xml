@@ -8,10 +8,10 @@
     android:layout_margin="5dp">
     <TextView
         android:id="@+id/author"
-        style="@style/TextViewMovieDetailItemHeader"
+        style="@style/TextViewReviewDetailItemHeader"
         tools:text="@string/content_sample_author"/>
     <TextView
         android:id="@+id/review"
-        style="@style/TextViewMovieDetailItemValue"
+        style="@style/TextViewReviewDetailItemValue"
         tools:text="@string/content_sample_synopsis"/>
 </LinearLayout>

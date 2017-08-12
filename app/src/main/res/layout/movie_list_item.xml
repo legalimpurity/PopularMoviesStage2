@@ -8,7 +8,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/movie_poster"
-        android:minHeight="430dp"
-        android:minWidth="286dp"
         android:adjustViewBounds="true"/>
 </LinearLayout>

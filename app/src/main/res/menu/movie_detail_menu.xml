@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="popularmoviesstage1.legalimpurity.com.popularmoviesstage2.MovieDetailActivity">
+    <item
+        android:id="@+id/action_share"
+        android:orderInCategory="100"
+        android:title="@string/action_share"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_share_white_24dp"/>
+    <item
+        android:id="@+id/action_bookmark"
+        android:orderInCategory="100"
+        android:title="@string/action_bookmark"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_bookmark_border_white_24dp"/>
+</menu>

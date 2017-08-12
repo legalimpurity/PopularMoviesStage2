@@ -60,6 +60,24 @@ public class TrailersFragment extends Fragment{
                         startActivity(webIntent);
                     }
             }
+
+            @Override
+            public void onMovieShare(TrailerVideoObject trailerObject) {
+                String sharer_content = "";
+
+                sharer_content = sharer_content + getString(R.string.youtube_url);
+                sharer_content = sharer_content + YOUTUBE_VIDEO_URL + trailerObject.getYoutubeKey();
+
+                sharer_content = sharer_content + getString(R.string.shared_from_themoviedb);
+
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+
+                intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.shared_subject));
+                intent.putExtra(android.content.Intent.EXTRA_TEXT, sharer_content);
+                startActivity(Intent.createChooser(intent, getString(R.string.app_name)));
+            }
         };
         trailersListAdapter = new TrailersListAdapter(getActivity(),tcl);
         if (mo.getTrailerVideoObjs() != null)

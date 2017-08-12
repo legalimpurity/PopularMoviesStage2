@@ -4,7 +4,6 @@
     <string name="pick_an_order">Pick an Sorting Order</string>
     <string name="most_popular">Most Popular</string>
     <string name="highest_rated">Highest Rated</string>
-    <string name="action_settings">Settings</string>
     <string name="release_date">Release Date</string>
     <string name="vote_average">Vote Average</string>
     <string name="plot_synopsis">Plot Synopsis</string>
@@ -16,6 +15,9 @@
     <string name="movie_details">Movie Details</string>
     <string name="trailers">Trailers</string>
     <string name="reviews">Reviews</string>
+    <string name="action_share">Share</string>
+    <string name="action_bookmark">Bookmark</string>
+    <string name="youtube_url">Youtube link :\n</string>
 
     <string name="content_sample_synopsis">Raj is a rich, carefree, happy-go-lucky second generation NRI. Simran is the daughter of Chaudhary Baldev Singh, who in spite of being an NRI is very strict about adherence to Indian values. Simran has left for India to be married to her childhood fiancé. Raj leaves for India with a mission at his hands, to claim his lady love under the noses of her whole family. Thus begins a saga.</string>
     <string name="content_sample_vote_average">9.2</string>

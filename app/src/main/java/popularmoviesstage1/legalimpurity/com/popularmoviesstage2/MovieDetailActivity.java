@@ -12,6 +12,9 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -41,7 +44,6 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
     @BindView(R.id.movie_poster) ImageView movie_poster;
     @BindView(R.id.toolbar_layout) CollapsingToolbarLayout toolbar_layout;
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.fab) FloatingActionButton fab;
     @BindView(R.id.container) ViewPager container;
     @BindView(R.id.tabs) TabLayout tabs;
 
@@ -61,7 +63,6 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
             mo = (MovieObject) getIntent().getExtras().getParcelable(MOVIE_OBJECT_KEY);
         }
         setView(this);
-        setFab(this);
         loadReviewsAndTrailerData(this);
     }
 
@@ -152,7 +153,7 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
         tabs.setupWithViewPager(container);
     }
 
-    private void setFab(final Activity act)
+    private void shareData(final Activity act)
     {
 
         String sharer_content = "";
@@ -172,18 +173,34 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
         sharer_content = sharer_content + act.getResources().getString(R.string.shared_from_themoviedb);
 
         final String finalSharer_content = sharer_content;
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_SEND);
-                intent.setType("text/plain");
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("text/plain");
 
-                intent.putExtra(android.content.Intent.EXTRA_SUBJECT, act.getResources().getString(R.string.shared_subject));
-                intent.putExtra(android.content.Intent.EXTRA_TEXT, finalSharer_content);
-                act.startActivity(Intent.createChooser(intent, act.getResources().getString(R.string.app_name)));
-            }
-        });
+        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, act.getResources().getString(R.string.shared_subject));
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, finalSharer_content);
+        act.startActivity(Intent.createChooser(intent, act.getResources().getString(R.string.app_name)));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.movie_detail_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id)
+        {
+            case R.id.action_share: shareData(this);
+                return true;
+            case R.id.action_bookmark:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 }

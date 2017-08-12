@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -62,6 +63,7 @@ public class TrailersListAdapter extends RecyclerView.Adapter<TrailersListAdapte
 
         private TextView trailerName;
         private ImageView thumbnail;
+        private ImageButton trailer_share_button;
         private View root_view;
 
         private MovieItemHolder(View itemView) {
@@ -69,6 +71,7 @@ public class TrailersListAdapter extends RecyclerView.Adapter<TrailersListAdapte
             root_view = (View) itemView.findViewById(R.id.root_view);
             trailerName = (TextView) itemView.findViewById(R.id.trailerName);
             thumbnail = (ImageView) itemView.findViewById(R.id.thumbnail);
+            trailer_share_button = (ImageButton) itemView.findViewById(R.id.trailer_share_button);
         }
 
         void bind(final TrailerVideoObject to)
@@ -77,12 +80,18 @@ public class TrailersListAdapter extends RecyclerView.Adapter<TrailersListAdapte
             Picasso
                     .with(act)
                     .load(NetworkUtils.YOUTUBE_THUMBNAIL_URL_PREFIX+to.getYoutubeKey()+NetworkUtils.YOUTUBE_THUMBNAIL_URL_SUFFIX)
-                    .placeholder(R.drawable.ic_play_arrow_white_24dp)
+                    .placeholder(R.mipmap.movie_trailer)
                     .into(thumbnail);
             root_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     clicker.onMovieCLick(to);
+                }
+            });
+            trailer_share_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clicker.onMovieShare(to);
                 }
             });
         }

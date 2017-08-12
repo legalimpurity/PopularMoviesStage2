@@ -4,4 +4,5 @@ import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects.Trailer
 
 public interface TrailerClickListener {
     public void onMovieCLick(TrailerVideoObject bookName);
+    public void onMovieShare(TrailerVideoObject bookName);
 }
