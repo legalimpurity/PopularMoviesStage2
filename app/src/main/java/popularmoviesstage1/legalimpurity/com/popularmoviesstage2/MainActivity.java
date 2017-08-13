@@ -49,26 +49,74 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
     private String options[];
 
     private int selectedApi_code = 0;
+    private boolean wasDataLoadedPerfectlyForSelectedApiCode = false;
 
     private static final int MOVIES_DATA_LOADER = 22;
     private static final int OFFLINE_BOOKMARKS_DATA_LOADER = 23;
+
+    private static final String SAVED_INSTANCE_DATA_LOADED_KEY = "SAVED_INSTANCE_INTERNET_KEY";
+    private static final String SAVED_INSTANCE_MOVIE_LIST = "SAVED_INSTANCE_MOVIE_LIST";
+    private static final String SAVED_INSTANCE_API_CODE = "SAVED_INSTANCE_API_CODE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        options = new String[] {getString(R.string.most_popular), getString(R.string.highest_rated), getString(R.string.bookmarks)};
+
         findViews(this);
         setAdapter(this);
 
-        options = new String[] {getString(R.string.most_popular), getString(R.string.highest_rated), getString(R.string.bookmarks)};
+        checkForSavedInstanceState(savedInstanceState);
+        addNetworkStateReceiver(this);
+    }
+
+    private void checkForSavedInstanceState(Bundle savedInstanceState)
+    {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(SAVED_INSTANCE_DATA_LOADED_KEY)) {
+                boolean wasDataLoadedPerfectlyForSelectedApiCode = savedInstanceState.getBoolean(SAVED_INSTANCE_DATA_LOADED_KEY);
+                //Check was their internet in last instance state ?
+                if(wasDataLoadedPerfectlyForSelectedApiCode)
+                {
+                    if (savedInstanceState.containsKey(SAVED_INSTANCE_API_CODE) && savedInstanceState.containsKey(SAVED_INSTANCE_MOVIE_LIST))
+                    {
+                        restoreDatafromSavedInstance(savedInstanceState);
+                    }
+                }
+                // if no internet was the app on bookmarks screen?
+                else if(savedInstanceState.containsKey(SAVED_INSTANCE_API_CODE))
+                {
+                    if(savedInstanceState.getInt(SAVED_INSTANCE_API_CODE) == 2)
+                        restoreDatafromSavedInstance(savedInstanceState);
+                }
+                else
+                    processFlow();
+            }
+        }
+        else
+            processFlow();
+    }
+
+    private void restoreDatafromSavedInstance(Bundle savedInstanceState)
+    {
+        selectedApi_code = savedInstanceState.getInt(SAVED_INSTANCE_API_CODE);
+        movies_list = savedInstanceState.getParcelableArrayList(SAVED_INSTANCE_MOVIE_LIST);
+        updateTitleBar();
+        processLoader();
+    }
+
+    // Reaching here means app was created freshly or was killed by the system in background or there was no internet last time the app was killed.
+    private void processFlow()
+    {
         selectedApi_code = MyPreferences.getInt(this,MyPreferences.PROPERTY_SORTING_ORDER);
 
         if(selectedApi_code == -1)
             selectedApi_code = 0;
 
-        ab = getSupportActionBar();
-        ab.setTitle(options[selectedApi_code]);
+        updateTitleBar();
 
         if(NetworkUtils.isNetworkAvailable(this)) {
             // Will be called from networkAvailable Function
@@ -76,16 +124,31 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
         }
         else
         {
-            // Movies gotta load wihtout interner also
-            if(options[selectedApi_code].equalsIgnoreCase(optionValues[2]))
-                loadMoviesData(this);
+            // Movies gotta load without internet also, if app was on bookmarks before termination
+            if(selectedApi_code == 2)
+                loadMoviesData(this,2);
             else {
                 no_internet_text_view.setText(R.string.no_internet);
+                wasDataLoadedPerfectlyForSelectedApiCode = false;
                 showErrorMessage();
             }
         }
-        addNetworkStateReceiver(this);
     }
+
+    private void updateTitleBar()
+    {
+        ab.setTitle(options[selectedApi_code]);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_INSTANCE_DATA_LOADED_KEY, wasDataLoadedPerfectlyForSelectedApiCode);
+        outState.putParcelableArrayList(SAVED_INSTANCE_MOVIE_LIST, movies_list);
+        outState.putInt(SAVED_INSTANCE_API_CODE, selectedApi_code);
+    }
+
 
     private void addNetworkStateReceiver(final Activity act)
     {
@@ -94,7 +157,8 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
             @Override
             public void networkAvailable() {
                 showMovies();
-                loadMoviesData(act);
+                // Just get the data when network is available or when the app was started. wasDataLoadedPerfectlyForSelectedApiCode should be false so loadMoviesData should load data.
+                loadMoviesData(act,selectedApi_code);
                 networkStateReceiver.removeListener(this);
             }
 
@@ -109,6 +173,7 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
     {
         movie_list_recycler_view = (RecyclerView) act.findViewById(R.id.movie_list_recycler_view);
         no_internet_text_view = (TextView) act.findViewById(R.id.no_internet_text_view);
+        ab = getSupportActionBar();
     }
 
     private void setAdapter(final Activity act)
@@ -141,34 +206,35 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
 
     }
 
-    private void loadMoviesData(Activity act) {
-        LoaderManager loaderManager = getSupportLoaderManager();
-        Bundle queryBundle = new Bundle();
+    private void loadMoviesData(Activity act, int newSelectedApi_code) {
+        if(newSelectedApi_code != selectedApi_code || wasDataLoadedPerfectlyForSelectedApiCode == false) {
+            selectedApi_code = newSelectedApi_code;
+            MyPreferences.setInt(act,MyPreferences.PROPERTY_SORTING_ORDER,selectedApi_code);
+            LoaderManager loaderManager = getSupportLoaderManager();
+            Bundle queryBundle = new Bundle();
 
-        if(selectedApi_code == 2)
-        {
-            Loader moviesLoader = loaderManager.getLoader(OFFLINE_BOOKMARKS_DATA_LOADER);
-            if (moviesLoader == null) {
-                loaderManager.initLoader(OFFLINE_BOOKMARKS_DATA_LOADER, queryBundle, this);
-            } else {
-                loaderManager.restartLoader(OFFLINE_BOOKMARKS_DATA_LOADER, queryBundle, this);
-            }
-        }
-        else {
-            if(NetworkUtils.isNetworkAvailable(this)) {
-                queryBundle.putString(FetchMoviesLoader.SORT_BY_PARAM, optionValues[selectedApi_code]);
-
-                Loader moviesLoader = loaderManager.getLoader(MOVIES_DATA_LOADER);
+            if (selectedApi_code == 2) {
+                Loader moviesLoader = loaderManager.getLoader(OFFLINE_BOOKMARKS_DATA_LOADER);
                 if (moviesLoader == null) {
-                    loaderManager.initLoader(MOVIES_DATA_LOADER, queryBundle, this);
+                    loaderManager.initLoader(OFFLINE_BOOKMARKS_DATA_LOADER, queryBundle, this);
                 } else {
-                    loaderManager.restartLoader(MOVIES_DATA_LOADER, queryBundle, this);
+                    loaderManager.restartLoader(OFFLINE_BOOKMARKS_DATA_LOADER, queryBundle, this);
                 }
-            }
-            else
-            {
-                no_internet_text_view.setText(R.string.no_internet);
-                showErrorMessage();
+            } else {
+                if (NetworkUtils.isNetworkAvailable(this)) {
+                    queryBundle.putString(FetchMoviesLoader.SORT_BY_PARAM, optionValues[selectedApi_code]);
+
+                    Loader moviesLoader = loaderManager.getLoader(MOVIES_DATA_LOADER);
+                    if (moviesLoader == null) {
+                        loaderManager.initLoader(MOVIES_DATA_LOADER, queryBundle, this);
+                    } else {
+                        loaderManager.restartLoader(MOVIES_DATA_LOADER, queryBundle, this);
+                    }
+                } else {
+                    wasDataLoadedPerfectlyForSelectedApiCode = false;
+                    no_internet_text_view.setText(R.string.no_internet);
+                    showErrorMessage();
+                }
             }
         }
     }
@@ -211,6 +277,7 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
     public void onLoadFinished(Loader loader, Object data) {
         if (null == data) {
             no_internet_text_view.setText(R.string.api_error);
+            wasDataLoadedPerfectlyForSelectedApiCode = false;
             showErrorMessage();
         } else {
             ArrayList<MovieObject> realdata;
@@ -219,7 +286,8 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
             {
                 realdata = (ArrayList<MovieObject>) data;
                 no_internet_text_view.setText(R.string.change_order_zero);
-                processLoader(realdata);
+                movies_list = realdata;
+                processLoader();
             }
             else if (loader.getId() == OFFLINE_BOOKMARKS_DATA_LOADER && (selectedApi_code == 2))
             {
@@ -232,17 +300,18 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
 
                 }
                 no_internet_text_view.setText(R.string.bookmarks_zero);
-                processLoader(realdata);
+                movies_list = realdata;
+                processLoader();
             }
         }
     }
 
 
-    private void processLoader(ArrayList<MovieObject> realdata)
+    private void processLoader()
     {
-        mAdapter.setMoviesData(realdata);
-
-        if(realdata.size() == 0)
+        mAdapter.setMoviesData(movies_list);
+        wasDataLoadedPerfectlyForSelectedApiCode = true;
+        if(movies_list != null && movies_list.size() == 0)
             showErrorMessage();
         else
             showMovies();
@@ -268,10 +337,8 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
             builder.setItems(options, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    selectedApi_code = which;
-                    MyPreferences.setInt(act,MyPreferences.PROPERTY_SORTING_ORDER,selectedApi_code);
                     ab.setTitle(options[selectedApi_code]);
-                    loadMoviesData(act);
+                    loadMoviesData(act,which);
                 }
             });
             builder.show();
