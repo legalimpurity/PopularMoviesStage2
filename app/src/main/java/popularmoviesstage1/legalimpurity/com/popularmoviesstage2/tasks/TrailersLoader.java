@@ -36,9 +36,9 @@ public class TrailersLoader extends AsyncTaskLoader {
 
     @Override
     public ArrayList<TrailerVideoObject> loadInBackground() {
-        String movieAPIID = args.getString(MOVIE_API_ID);
+        long movieAPIID = args.getLong(MOVIE_API_ID);
 
-        if (movieAPIID == null || TextUtils.isEmpty(movieAPIID)) {
+        if (movieAPIID == 0) {
             return null;
         }
 
@@ -47,7 +47,7 @@ public class TrailersLoader extends AsyncTaskLoader {
         try {
             String jsonMoviesResponse = NetworkUtils
                     .getResponseFromHttpUrl(sortByRequestUrl);
-            ArrayList<TrailerVideoObject> output = JsonUtils.getTrailerObjectsFromJson(context,jsonMoviesResponse);
+            ArrayList<TrailerVideoObject> output = JsonUtils.getTrailerObjectsFromJson(context,jsonMoviesResponse,movieAPIID);
             return output;
         } catch (Exception e) {
             e.printStackTrace();

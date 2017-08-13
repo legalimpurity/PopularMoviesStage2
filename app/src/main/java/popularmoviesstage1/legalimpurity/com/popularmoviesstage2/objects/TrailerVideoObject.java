@@ -1,7 +1,11 @@
 package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.contentprovider.MoviesContract;
 
 /**
  * Created by root on 7/8/17.
@@ -9,12 +13,12 @@ import android.os.Parcelable;
 
 public class TrailerVideoObject implements Parcelable {
 
-    private String ApiId;
+    private long Foreign_ApiID;
     private String Name;
     private String YoutubeKey;
 
-    public TrailerVideoObject(String ApiId, String name, String youtubeKey) {
-        this.ApiId = ApiId;
+    public TrailerVideoObject(long Foreign_ApiID, String name, String youtubeKey) {
+        this.Foreign_ApiID = Foreign_ApiID;
         Name = name;
         YoutubeKey = youtubeKey;
     }
@@ -44,8 +48,10 @@ public class TrailerVideoObject implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[] {
                 this.Name,
-                this.YoutubeKey,
-                this.ApiId
+                this.YoutubeKey
+        });
+        dest.writeLongArray(new long[]{
+                this.Foreign_ApiID
         });
     }
 
@@ -64,6 +70,23 @@ public class TrailerVideoObject implements Parcelable {
         in.readStringArray(data);
         this.Name = data[0];
         this.YoutubeKey = data[1];
-        this.ApiId = data[2];
+
+        long[] data2 = new long[1];
+        this.Foreign_ApiID = data2[0];
+    }
+
+    public TrailerVideoObject(Cursor mCursor){
+        this.Foreign_ApiID = mCursor.getLong(MoviesContract.TRAILER_PROJECTION_INDEXES.COLUMN_FOREIGN_ID_POSITION);
+        this.YoutubeKey = mCursor.getString(MoviesContract.TRAILER_PROJECTION_INDEXES.COLUMN_YOUTUBE_KEY_POSITION);
+        this.Name = mCursor.getString(MoviesContract.TRAILER_PROJECTION_INDEXES.COLUMN_NAME_POSITION);
+    }
+
+
+    public ContentValues getContentValues() {
+        ContentValues movieObjectValues = new ContentValues();
+        movieObjectValues.put(MoviesContract.TrailerVideosEntry.COLUMN_FOREIGN_ID, Foreign_ApiID);
+        movieObjectValues.put(MoviesContract.TrailerVideosEntry.COLUMN_YOUTUBE_KEY, YoutubeKey);
+        movieObjectValues.put(MoviesContract.TrailerVideosEntry.COLUMN_NAME, Name);
+        return movieObjectValues;
     }
 }

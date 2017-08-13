@@ -182,7 +182,7 @@ public class MovieObject implements Parcelable {
         this.MoviePosterImageThumbnailUrl = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_POSTER_URL_POSITION);
         this.PlotSynopsis = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_PLOT_SYNOPSIS_POSITION);
         this.UserRating = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_USER_RATING_POSITION);
-        this.ReleaseDate = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_USER_RATING_POSITION);
+        this.ReleaseDate = mCursor.getString(MoviesContract.MOVIES_PROJECTION_INDEXES.COLUMN_RELEASE_DATE_POSITION);
         // If object is coming from DB, it is obviosuly bookmarked
         this.bookmarked = true;
     }
@@ -198,6 +198,32 @@ public class MovieObject implements Parcelable {
         movieObjectValues.put(MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE, ReleaseDate);
         movieObjectValues.put(MoviesContract.MoviesEntry.COLUMN_USER_RATING, UserRating);
         return movieObjectValues;
+    }
+
+    public ContentValues[] getReviewsContentValues() {
+        ContentValues[] reviews = new ContentValues[ReviewObjs.size()];
+        for(int i = 0; i < ReviewObjs.size(); i++) {
+            ReviewObject r = ReviewObjs.get(i);
+            ContentValues reviewObjectValues = new ContentValues();
+            reviewObjectValues.put(MoviesContract.ReviewEntry.COLUMN_FOREIGN_ID, ApiId);
+            reviewObjectValues.put(MoviesContract.ReviewEntry.COLUMN_CONTENT, r.getContent());
+            reviewObjectValues.put(MoviesContract.ReviewEntry.COLUMN_AUTHOR, r.getAuthor());
+            reviews[i] = reviewObjectValues;
+        }
+        return reviews;
+    }
+
+    public ContentValues[] getTrailerContentValues() {
+        ContentValues[] trailers = new ContentValues[TrailerVideoObjs.size()];
+        for(int i = 0; i < TrailerVideoObjs.size(); i++) {
+            TrailerVideoObject t = TrailerVideoObjs.get(i);
+            ContentValues reviewObjectValues = new ContentValues();
+            reviewObjectValues.put(MoviesContract.TrailerVideosEntry.COLUMN_FOREIGN_ID, ApiId);
+            reviewObjectValues.put(MoviesContract.TrailerVideosEntry.COLUMN_NAME, t.getName());
+            reviewObjectValues.put(MoviesContract.TrailerVideosEntry.COLUMN_YOUTUBE_KEY, t.getYoutubeKey());
+            trailers[i] = reviewObjectValues;
+        }
+        return trailers;
     }
 
 }

@@ -78,7 +78,7 @@ public class JsonUtils {
         return parsedMoviesData;
     }
 
-    public static ArrayList<ReviewObject> getReviewObjectsFromJson(Context context, String reviewsJsonStr) throws JSONException {
+    public static ArrayList<ReviewObject> getReviewObjectsFromJson(Context context, String reviewsJsonStr, long moID) throws JSONException {
 
         final String REVIEWS_LIST = "results";
 
@@ -96,7 +96,7 @@ public class JsonUtils {
 
         for (int i = 0; i < moviesArray.length(); i++) {
             JSONObject movieJSONObj = moviesArray.getJSONObject(i);
-            parsedMoviesData.add(new ReviewObject(i,movieJSONObj.getString(APIID_ATTRIBUTE),
+            parsedMoviesData.add(new ReviewObject(moID,
                     movieJSONObj.getString(AUTHOR_ATTRIBUTE),
                     movieJSONObj.getString(CONTENT_ATTRIBUTE)
             ));
@@ -105,7 +105,7 @@ public class JsonUtils {
         return parsedMoviesData;
     }
 
-    public static ArrayList<TrailerVideoObject> getTrailerObjectsFromJson(Context context, String reviewsJsonStr) throws JSONException {
+    public static ArrayList<TrailerVideoObject> getTrailerObjectsFromJson(Context context, String reviewsJsonStr, long moID) throws JSONException {
 
         final String REVIEWS_LIST = "results";
 
@@ -123,7 +123,7 @@ public class JsonUtils {
 
         for (int i = 0; i < moviesArray.length(); i++) {
             JSONObject movieJSONObj = moviesArray.getJSONObject(i);
-            parsedTrailersData.add(new TrailerVideoObject(movieJSONObj.getString(APIID_ATTRIBUTE),
+            parsedTrailersData.add(new TrailerVideoObject(moID,
                     movieJSONObj.getString(NAME_ATTRIBUTE),
                     movieJSONObj.getString(KEY_ATTRIBUTE)
             ));

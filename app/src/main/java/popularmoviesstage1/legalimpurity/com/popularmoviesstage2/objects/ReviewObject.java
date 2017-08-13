@@ -1,29 +1,33 @@
 package popularmoviesstage1.legalimpurity.com.popularmoviesstage2.objects;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import popularmoviesstage1.legalimpurity.com.popularmoviesstage2.contentprovider.MoviesContract;
 
 /**
  * Created by root on 7/8/17.
  */
 
 public class ReviewObject implements Parcelable {
-    private String ApiID;
+    private long Foreign_ApiID;
     private String Author;
     private String Content;
 
-    public ReviewObject(long _id, String apiID, String author, String content) {
-        ApiID = apiID;
-        Author = author;
-        Content = content;
+    public ReviewObject(long Foreign_ApiID, String author, String content) {
+        this.Foreign_ApiID = Foreign_ApiID;
+        this.Author = author;
+        this.Content = content;
     }
 
-    public String getApiID() {
-        return ApiID;
+    public long getForeign_ApiID() {
+        return Foreign_ApiID;
     }
 
-    public void setApiID(String apiID) {
-        ApiID = apiID;
+    public void setForeign_ApiID(long foreign_ApiID) {
+        Foreign_ApiID = foreign_ApiID;
     }
 
     public String getAuthor() {
@@ -52,8 +56,10 @@ public class ReviewObject implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[] {
                 this.Author,
-                this.Content,
-                this.ApiID
+                this.Content
+        });
+        dest.writeLongArray(new long[] {
+                this.Foreign_ApiID
         });
     }
 
@@ -72,6 +78,25 @@ public class ReviewObject implements Parcelable {
         in.readStringArray(data);
         this.Author = data[0];
         this.Content = data[1];
-        this.ApiID = data[2];
+
+        long[] data2 = new long[1];
+        in.readLongArray(data2);
+        this.Foreign_ApiID = data2[0];
     }
+
+    public ReviewObject(Cursor mCursor){
+        this.Foreign_ApiID = mCursor.getLong(MoviesContract.REVIEWS_PROJECTION_INDEXES.COLUMN_FOREIGN_ID_POSITION);
+        this.Content = mCursor.getString(MoviesContract.REVIEWS_PROJECTION_INDEXES.COLUMN_CONTENT_POSITION);
+        this.Author = mCursor.getString(MoviesContract.REVIEWS_PROJECTION_INDEXES.COLUMN_AUTHOR_POSITION);
+    }
+
+
+    public ContentValues getContentValues() {
+        ContentValues movieObjectValues = new ContentValues();
+        movieObjectValues.put(MoviesContract.ReviewEntry.COLUMN_FOREIGN_ID, Foreign_ApiID);
+        movieObjectValues.put(MoviesContract.ReviewEntry.COLUMN_AUTHOR, Author);
+        movieObjectValues.put(MoviesContract.ReviewEntry.COLUMN_CONTENT, Content);
+        return movieObjectValues;
+    }
+
 }

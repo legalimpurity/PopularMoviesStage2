@@ -58,10 +58,25 @@ public class MoviesContract {
         public static final String TABLE_NAME = "reviews";
 
         public static final String COLUMN_API_ID = "_id";
+        public static final String COLUMN_FOREIGN_ID = "foreign_id";
         public static final String COLUMN_AUTHOR = "author";
         public static final String COLUMN_CONTENT = "content";
     }
 
+    public static final String[] REVIEWS_PROJECTION = {
+            ReviewEntry.COLUMN_API_ID,
+            ReviewEntry.COLUMN_AUTHOR,
+            ReviewEntry.COLUMN_CONTENT,
+            ReviewEntry.COLUMN_FOREIGN_ID
+    };
+
+
+    public static final class REVIEWS_PROJECTION_INDEXES {
+        public static final int COLUMN_API_ID_POSITION = 0;
+        public static final int COLUMN_AUTHOR_POSITION = 1;
+        public static final int COLUMN_CONTENT_POSITION = 2;
+        public static final int COLUMN_FOREIGN_ID_POSITION = 3;
+    }
 
     public static final String PATH_TRAILER_VIDEOS = "trailerVideos";
 
@@ -73,7 +88,25 @@ public class MoviesContract {
         public static final String TABLE_NAME = "trailer_videos";
 
         public static final String COLUMN_API_ID = "_id";
+        public static final String COLUMN_FOREIGN_ID = "foreign_id";
         public static final String COLUMN_NAME = "trailer_name";
         public static final String COLUMN_YOUTUBE_KEY = "youtube_key";
     }
+
+    public static final String[] TRAILER_PROJECTION = {
+            TrailerVideosEntry.COLUMN_API_ID,
+            TrailerVideosEntry.COLUMN_NAME,
+            TrailerVideosEntry.COLUMN_YOUTUBE_KEY,
+            TrailerVideosEntry.COLUMN_FOREIGN_ID
+    };
+
+
+    public static final class TRAILER_PROJECTION_INDEXES {
+        public static final int COLUMN_API_ID_POSITION = 0;
+        public static final int COLUMN_NAME_POSITION = 1;
+        public static final int COLUMN_YOUTUBE_KEY_POSITION = 2;
+        public static final int COLUMN_FOREIGN_ID_POSITION = 3;
+    }
+
+
 }

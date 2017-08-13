@@ -34,7 +34,7 @@ public final class NetworkUtils {
 
     private final static String API_KEY = "api_key";
 
-    public static URL buildReviewsUrl(String movieApiId) {
+    public static URL buildReviewsUrl(long movieApiId) {
         Uri builtUri = Uri.parse(MOVIE_DATABASE_ROOT_URL+movieApiId+REVIEWS_APPENDING_TAG).buildUpon()
                 .appendQueryParameter(API_KEY, API_KEY_VALUE)
                 .build();
@@ -48,7 +48,7 @@ public final class NetworkUtils {
         return url;
     }
 
-    public static URL buildTrailersUrl(String movieApiId) {
+    public static URL buildTrailersUrl(Long movieApiId) {
         Uri builtUri = Uri.parse(MOVIE_DATABASE_ROOT_URL+movieApiId+VIDEOS_APPENDING_TAG).buildUpon()
                 .appendQueryParameter(API_KEY, API_KEY_VALUE)
                 .build();

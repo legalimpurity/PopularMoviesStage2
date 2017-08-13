@@ -35,9 +35,9 @@ public class ReviewsLoader extends AsyncTaskLoader {
 
     @Override
     public ArrayList<ReviewObject> loadInBackground() {
-        String movieAPIID = args.getString(MOVIE_API_ID);
+        long movieAPIID = args.getLong(MOVIE_API_ID);
 
-        if (movieAPIID == null || TextUtils.isEmpty(movieAPIID)) {
+        if (movieAPIID == 0) {
             return null;
         }
 
@@ -46,7 +46,7 @@ public class ReviewsLoader extends AsyncTaskLoader {
         try {
             String jsonMoviesResponse = NetworkUtils
                     .getResponseFromHttpUrl(sortByRequestUrl);
-            ArrayList<ReviewObject> output = JsonUtils.getReviewObjectsFromJson(context,jsonMoviesResponse);
+            ArrayList<ReviewObject> output = JsonUtils.getReviewObjectsFromJson(context,jsonMoviesResponse,movieAPIID);
             return output;
         } catch (Exception e) {
             e.printStackTrace();

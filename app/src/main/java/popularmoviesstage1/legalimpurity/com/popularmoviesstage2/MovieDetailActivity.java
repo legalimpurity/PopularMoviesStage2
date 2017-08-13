@@ -2,11 +2,13 @@ package popularmoviesstage1.legalimpurity.com.popularmoviesstage2;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +40,9 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
     private static final int TRAILERS_DATA_LOADER = 24;
     private static final int REVIEWS_DATA_LOADER = 23;
 
+    private static final int OFFLINE_TRAILERS_DATA_LOADER = 25;
+    private static final int OFFLINE_REVIEWS_DATA_LOADER = 26;
+
 
     @BindView(R.id.movie_poster) ImageView movie_poster;
     @BindView(R.id.toolbar_layout) CollapsingToolbarLayout toolbar_layout;
@@ -46,8 +51,10 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
     @BindView(R.id.tabs) TabLayout tabs;
 
     private MovieObject mo;
-    private MovieDetailPagerAdapter movieDetailPagerAdapter;
+    private int REVIEWS_LOADER;
+    private int TRAILER_LOADER;
 
+    private MovieDetailPagerAdapter movieDetailPagerAdapter;
     private Menu menu;
 
     private boolean bookmarked;
@@ -69,11 +76,25 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
 
 
     @Override
-    public Loader<String> onCreateLoader(int id, final Bundle args) {
+    public Loader onCreateLoader(int id, final Bundle args) {
+//        MoviesContract.MoviesEntry.COLUMN_API_ID + " = ? "
+//        new String[]{String.valueOf(mo.getApiId())}
         switch (id)
         {
             case TRAILERS_DATA_LOADER : return new TrailersLoader(this, args);
             case REVIEWS_DATA_LOADER : return new ReviewsLoader(this, args);
+            case OFFLINE_TRAILERS_DATA_LOADER: return new CursorLoader(this,
+                    MoviesContract.TrailerVideosEntry.CONTENT_URI,
+                    MoviesContract.TRAILER_PROJECTION,
+                    MoviesContract.TrailerVideosEntry.COLUMN_FOREIGN_ID + "=?",
+                    new String[]{String.valueOf(mo.getApiId())},
+                    null);
+            case OFFLINE_REVIEWS_DATA_LOADER: return new CursorLoader(this,
+                    MoviesContract.ReviewEntry.CONTENT_URI,
+                    MoviesContract.REVIEWS_PROJECTION,
+                    MoviesContract.TrailerVideosEntry.COLUMN_FOREIGN_ID + "=?",
+                    new String[]{String.valueOf(mo.getApiId())},
+                    null);
             default : return null;
         }
     }
@@ -98,6 +119,28 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
                 ArrayList<ReviewObject> reviewsdata = (ArrayList<ReviewObject>) data;
                 mo.setReviewObjs(reviewsdata);
             }
+            else if(loader.getId() == OFFLINE_REVIEWS_DATA_LOADER)
+            {
+                Cursor mCursor = (Cursor) data;
+                ArrayList<ReviewObject> reviewsdata = new ArrayList<ReviewObject>();
+                for(int i = 0; i < mCursor.getCount(); i++)
+                {
+                    mCursor.moveToPosition(i);
+                    reviewsdata.add(new ReviewObject(mCursor));
+                }
+                mo.setReviewObjs(reviewsdata);
+            }
+            else if(loader.getId() == OFFLINE_TRAILERS_DATA_LOADER)
+            {
+                Cursor mCursor = (Cursor) data;
+                ArrayList<TrailerVideoObject> trailersdata = new ArrayList<TrailerVideoObject>();
+                for(int i = 0; i < mCursor.getCount(); i++)
+                {
+                    mCursor.moveToPosition(i);
+                    trailersdata.add(new TrailerVideoObject(mCursor));
+                }
+                mo.setTrailerVideoObjs(trailersdata);
+            }
             showMovies();
         }
     }
@@ -105,27 +148,35 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
     private void loadReviewsAndTrailerData(FragmentActivity act) {
 
         LoaderManager loaderManager = act.getSupportLoaderManager();
+        if(NetworkUtils.isNetworkAvailable(this)) {
+            REVIEWS_LOADER = REVIEWS_DATA_LOADER;
+            TRAILER_LOADER = TRAILERS_DATA_LOADER;
+        }
+        else
+        {
+            REVIEWS_LOADER = OFFLINE_REVIEWS_DATA_LOADER;
+            TRAILER_LOADER = OFFLINE_TRAILERS_DATA_LOADER;
+        }
 
         Bundle reviewsBundle = new Bundle();
-        reviewsBundle.putString(ReviewsLoader.MOVIE_API_ID, mo.getApiId()+"");
+        reviewsBundle.putLong(ReviewsLoader.MOVIE_API_ID, mo.getApiId());
 
-        Loader<String> reviewsLoader = loaderManager.getLoader(REVIEWS_DATA_LOADER);
+        Loader<String> reviewsLoader = loaderManager.getLoader(REVIEWS_LOADER);
         if (reviewsLoader == null) {
-            loaderManager.initLoader(REVIEWS_DATA_LOADER, reviewsBundle, this);
+            loaderManager.initLoader(REVIEWS_LOADER, reviewsBundle, this);
         } else {
-            loaderManager.restartLoader(REVIEWS_DATA_LOADER, reviewsBundle, this);
+            loaderManager.restartLoader(REVIEWS_LOADER, reviewsBundle, this);
         }
 
         Bundle trailerBundle = new Bundle();
-        trailerBundle.putString(TrailersLoader.MOVIE_API_ID, mo.getApiId()+"");
+        trailerBundle.putLong(TrailersLoader.MOVIE_API_ID, mo.getApiId());
 
-        Loader<String> trailersLoader = loaderManager.getLoader(TRAILERS_DATA_LOADER);
+        Loader<String> trailersLoader = loaderManager.getLoader(TRAILER_LOADER);
         if (trailersLoader == null) {
-            loaderManager.initLoader(TRAILERS_DATA_LOADER, trailerBundle, this);
+            loaderManager.initLoader(TRAILER_LOADER, trailerBundle, this);
         } else {
-            loaderManager.restartLoader(TRAILERS_DATA_LOADER, trailerBundle, this);
+            loaderManager.restartLoader(TRAILER_LOADER, trailerBundle, this);
         }
-
     }
 
     private void showErrorMessage()
@@ -210,12 +261,23 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
     private void toggleBookmark(final Activity act)
     {
         if(bookmarked)
-            act.getContentResolver().delete(MoviesContract.MoviesEntry.CONTENT_URI, MoviesContract.MoviesEntry.COLUMN_API_ID + " = ? ",new String[]{String.valueOf(mo.getApiId())});
+        {
+            act.getContentResolver().delete(MoviesContract.MoviesEntry.CONTENT_URI, MoviesContract.MoviesEntry.COLUMN_API_ID + " = ? ", new String[]{String.valueOf(mo.getApiId())});
+            act.getContentResolver().delete(MoviesContract.ReviewEntry.CONTENT_URI, MoviesContract.ReviewEntry.COLUMN_FOREIGN_ID + " = ? ", new String[]{String.valueOf(mo.getApiId())});
+            act.getContentResolver().delete(MoviesContract.TrailerVideosEntry.CONTENT_URI, MoviesContract.TrailerVideosEntry.COLUMN_FOREIGN_ID + " = ? ", new String[]{String.valueOf(mo.getApiId())});
+        }
         else
+        {
             act.getContentResolver().insert(
-                MoviesContract.MoviesEntry.CONTENT_URI,
-                mo.getContentValues());
-
+                    MoviesContract.MoviesEntry.CONTENT_URI,
+                    mo.getContentValues());
+            act.getContentResolver().bulkInsert(
+                    MoviesContract.ReviewEntry.CONTENT_URI,
+                    mo.getReviewsContentValues());
+            act.getContentResolver().bulkInsert(
+                    MoviesContract.TrailerVideosEntry.CONTENT_URI,
+                    mo.getTrailerContentValues());
+        }
         bookmarked = !bookmarked;
         updateMenuTitles();
     }
