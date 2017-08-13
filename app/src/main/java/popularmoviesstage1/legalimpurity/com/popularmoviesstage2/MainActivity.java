@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
     private static final int MOVIES_DATA_LOADER = 22;
     private static final int OFFLINE_BOOKMARKS_DATA_LOADER = 23;
 
-    private static final String SAVED_INSTANCE_DATA_LOADED_KEY = "SAVED_INSTANCE_INTERNET_KEY";
+    private static final String SAVED_INSTANCE_DATA_LOADED_KEY = "SAVED_INSTANCE_DATA_LOADED_KEY";
     private static final String SAVED_INSTANCE_MOVIE_LIST = "SAVED_INSTANCE_MOVIE_LIST";
     private static final String SAVED_INSTANCE_API_CODE = "SAVED_INSTANCE_API_CODE";
 

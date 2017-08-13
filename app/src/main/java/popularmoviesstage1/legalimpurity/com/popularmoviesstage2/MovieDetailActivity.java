@@ -8,6 +8,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
@@ -17,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -43,6 +45,9 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
     private static final int OFFLINE_TRAILERS_DATA_LOADER = 25;
     private static final int OFFLINE_REVIEWS_DATA_LOADER = 26;
 
+    private static final String SAVED_INSTANCE_DATA_LOADED_KEY = "SAVED_INSTANCE_DATA_LOADED_KEY";
+    private static final String SAVED_INSTANCE_MOVIE_OBJECT = "SAVED_INSTANCE_MOVIE_OBJECT";
+
 
     @BindView(R.id.movie_poster) ImageView movie_poster;
     @BindView(R.id.toolbar_layout) CollapsingToolbarLayout toolbar_layout;
@@ -53,11 +58,13 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
     private MovieObject mo;
     private int REVIEWS_LOADER;
     private int TRAILER_LOADER;
+    private boolean bookmarked;
+    // If it reaches 2 then, both api's responded
+    private int wasDataLoadedPerfectlyForReviewsAndTrailers = 0;
 
     private MovieDetailPagerAdapter movieDetailPagerAdapter;
     private Menu menu;
 
-    private boolean bookmarked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,13 +74,55 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        checkForSavedInstanceState(this,savedInstanceState);
+        setView(this);
+    }
+
+    private void checkForSavedInstanceState(AppCompatActivity act, Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(SAVED_INSTANCE_MOVIE_OBJECT))
+            {
+                mo = savedInstanceState.getParcelable(SAVED_INSTANCE_MOVIE_OBJECT);
+
+                if (savedInstanceState.containsKey(SAVED_INSTANCE_DATA_LOADED_KEY)) {
+                    if (savedInstanceState.getInt(SAVED_INSTANCE_DATA_LOADED_KEY) != 2) {
+                        loadReviewsAndTrailerData(act);
+                    }
+                    else
+                    {
+                        wasDataLoadedPerfectlyForReviewsAndTrailers = 2;
+                    }
+                }
+                else
+                    loadReviewsAndTrailerData(act);
+            }
+            else
+                processFlow(act);
+        }
+        else
+        {
+            processFlow(act);
+            loadReviewsAndTrailerData(act);
+        }
+    }
+
+    private void processFlow(AppCompatActivity act)
+    {
         if(getIntent() != null && getIntent().getExtras() != null) {
             mo = (MovieObject) getIntent().getExtras().getParcelable(MOVIE_OBJECT_KEY);
         }
-        setView(this);
-        loadReviewsAndTrailerData(this);
+        else
+            NavUtils.navigateUpFromSameTask(act);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putInt(SAVED_INSTANCE_DATA_LOADED_KEY, wasDataLoadedPerfectlyForReviewsAndTrailers);
+        outState.putParcelable(SAVED_INSTANCE_MOVIE_OBJECT,mo);
+    }
 
     @Override
     public Loader onCreateLoader(int id, final Bundle args) {
@@ -141,11 +190,12 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
                 }
                 mo.setTrailerVideoObjs(trailersdata);
             }
+            wasDataLoadedPerfectlyForReviewsAndTrailers++;
             showMovies();
         }
     }
 
-    private void loadReviewsAndTrailerData(FragmentActivity act) {
+    private void loadReviewsAndTrailerData(AppCompatActivity act) {
 
         LoaderManager loaderManager = act.getSupportLoaderManager();
         if(NetworkUtils.isNetworkAvailable(this)) {
@@ -271,12 +321,16 @@ public class MovieDetailActivity extends AppCompatActivity  implements LoaderMan
             act.getContentResolver().insert(
                     MoviesContract.MoviesEntry.CONTENT_URI,
                     mo.getContentValues());
-            act.getContentResolver().bulkInsert(
-                    MoviesContract.ReviewEntry.CONTENT_URI,
-                    mo.getReviewsContentValues());
-            act.getContentResolver().bulkInsert(
-                    MoviesContract.TrailerVideosEntry.CONTENT_URI,
-                    mo.getTrailerContentValues());
+            if(wasDataLoadedPerfectlyForReviewsAndTrailers != 2)
+                Toast.makeText(act,R.string.partially_saved_error,Toast.LENGTH_LONG);
+            else {
+                act.getContentResolver().bulkInsert(
+                        MoviesContract.ReviewEntry.CONTENT_URI,
+                        mo.getReviewsContentValues());
+                act.getContentResolver().bulkInsert(
+                        MoviesContract.TrailerVideosEntry.CONTENT_URI,
+                        mo.getTrailerContentValues());
+            }
         }
         bookmarked = !bookmarked;
         updateMenuTitles();
