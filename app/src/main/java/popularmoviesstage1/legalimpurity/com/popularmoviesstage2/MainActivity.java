@@ -46,9 +46,8 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
     private ArrayList<MovieObject> movies_list;
 
     final String optionValues[] = new String[] {"popular", "top_rated", "bookmarks"};
-    private CharSequence options[];
+    private String options[];
 
-    private String selectedApi = optionValues[0];
     private int selectedApi_code = 0;
 
     private static final int MOVIES_DATA_LOADER = 22;
@@ -62,12 +61,11 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
         findViews(this);
         setAdapter(this);
 
-        options = new CharSequence[] {getString(R.string.most_popular), getString(R.string.highest_rated), getString(R.string.bookmarks)};
+        options = new String[] {getString(R.string.most_popular), getString(R.string.highest_rated), getString(R.string.bookmarks)};
         selectedApi_code = MyPreferences.getInt(this,MyPreferences.PROPERTY_SORTING_ORDER);
 
         if(selectedApi_code == -1)
             selectedApi_code = 0;
-            selectedApi=optionValues[selectedApi_code];
 
         ab = getSupportActionBar();
         ab.setTitle(options[selectedApi_code]);
@@ -79,8 +77,8 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
         else
         {
             // Movies gotta load wihtout interner also
-            if(selectedApi.equalsIgnoreCase(optionValues[2]))
-                loadMoviesData(this,selectedApi);
+            if(options[selectedApi_code].equalsIgnoreCase(optionValues[2]))
+                loadMoviesData(this);
             else {
                 no_internet_text_view.setText(R.string.no_internet);
                 showErrorMessage();
@@ -91,12 +89,13 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
 
     private void addNetworkStateReceiver(final Activity act)
     {
-        NetworkStateReceiver networkStateReceiver = new NetworkStateReceiver();
+        final NetworkStateReceiver networkStateReceiver = new NetworkStateReceiver();
         networkStateReceiver.addListener(new NetworkStateReceiver.NetworkStateReceiverListener() {
             @Override
             public void networkAvailable() {
                 showMovies();
-                loadMoviesData(act,selectedApi);
+                loadMoviesData(act);
+                networkStateReceiver.removeListener(this);
             }
 
             @Override
@@ -142,11 +141,11 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
 
     }
 
-    private void loadMoviesData(Activity act, String sort_by) {
+    private void loadMoviesData(Activity act) {
         LoaderManager loaderManager = getSupportLoaderManager();
         Bundle queryBundle = new Bundle();
 
-        if(sort_by.equalsIgnoreCase("bookmarks"))
+        if(selectedApi_code == 2)
         {
             Loader moviesLoader = loaderManager.getLoader(OFFLINE_BOOKMARKS_DATA_LOADER);
             if (moviesLoader == null) {
@@ -157,7 +156,7 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
         }
         else {
             if(NetworkUtils.isNetworkAvailable(this)) {
-                queryBundle.putString(FetchMoviesLoader.SORT_BY_PARAM, sort_by);
+                queryBundle.putString(FetchMoviesLoader.SORT_BY_PARAM, optionValues[selectedApi_code]);
 
                 Loader moviesLoader = loaderManager.getLoader(MOVIES_DATA_LOADER);
                 if (moviesLoader == null) {
@@ -216,12 +215,13 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
         } else {
             ArrayList<MovieObject> realdata;
 
-            if(loader.getId() == MOVIES_DATA_LOADER)
+            if(loader.getId() == MOVIES_DATA_LOADER && (selectedApi_code == 0 || selectedApi_code == 1))
             {
                 realdata = (ArrayList<MovieObject>) data;
                 no_internet_text_view.setText(R.string.change_order_zero);
+                processLoader(realdata);
             }
-            else
+            else if (loader.getId() == OFFLINE_BOOKMARKS_DATA_LOADER && (selectedApi_code == 2))
             {
                 Cursor mCursor = (Cursor) data;
                 realdata = new ArrayList<MovieObject>();
@@ -229,19 +229,24 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
                 {
                     mCursor.moveToPosition(i);
                     realdata.add(new MovieObject(mCursor));
+
                 }
                 no_internet_text_view.setText(R.string.bookmarks_zero);
+                processLoader(realdata);
             }
-
-            mAdapter.setMoviesData(realdata);
-
-            if(realdata.size() == 0)
-                showErrorMessage();
-            else
-                showMovies();
         }
     }
 
+
+    private void processLoader(ArrayList<MovieObject> realdata)
+    {
+        mAdapter.setMoviesData(realdata);
+
+        if(realdata.size() == 0)
+            showErrorMessage();
+        else
+            showMovies();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -264,10 +269,9 @@ public class MainActivity extends AppCompatActivity  implements LoaderManager.Lo
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     selectedApi_code = which;
-                    selectedApi = optionValues[selectedApi_code];
                     MyPreferences.setInt(act,MyPreferences.PROPERTY_SORTING_ORDER,selectedApi_code);
                     ab.setTitle(options[selectedApi_code]);
-                    loadMoviesData(act,selectedApi);
+                    loadMoviesData(act);
                 }
             });
             builder.show();
